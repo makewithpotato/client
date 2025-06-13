@@ -2,22 +2,19 @@ import styled from 'styled-components';
 
 export const Wrapper = styled.div`
     background: #fcf7f7;
-    height: 100vh;
-    width: 100vw;
+    min-height: 100vh;
+    position: relative;
 `;
 
 export const Section = styled.section`
-    width: 100%;
-    padding: 40px 0 0 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 40px 24px 120px 24px;
 `;
 
 export const CardGrid = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    gap: 32px 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
     margin-top: 24px;
 `;
