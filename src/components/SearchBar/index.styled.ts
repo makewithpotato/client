@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 
 export const SearchBarWrapper = styled.div`
-    width: 80%;
+    width: 100%;
     margin: 32px 0 24px 0;
+    position: relative;
 `;
 
 export const Input = styled.input`
@@ -18,4 +19,13 @@ export const Input = styled.input`
         color: #a08b8b;
         opacity: 1;
     }
+`;
+
+export const SearchIcon = styled.div`
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a08b8b;
+    font-size: 18px;
 `;
