@@ -1,3 +1,5 @@
+import type { MovieData } from '@/types/programBook';
+
 export interface AnalysisResult {
     id: string;
     label: string;
@@ -13,16 +15,19 @@ export interface LayoutOption {
 
 export interface ProgramBookData {
     title: string;
-    movies: MovieLayoutData[];
+    description: string;
+    movies: MovieData[];
 }
 
 export interface MovieLayoutData {
-    movieId: string;
-    layoutId: number;
-    draggedItems: DraggedItemData[];
+    id: string;
+    title: string;
+    zones: string[];
 }
 
 export interface DraggedItemData {
-    resultId: string;
-    position: string; // 레이아웃 내 위치 정보
+    id: string;
+    type: 'analysis';
+    content: string;
+    zone: string;
 }
