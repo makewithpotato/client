@@ -1,0 +1,49 @@
+import { atom } from 'jotai';
+import type { MovieLayoutData, DraggedItemData } from '@/screens/newprogrambook/layout/types';
+import type { ProgramBookData as ProgramBookDataType } from '@/types/programBook';
+
+// 프로그램북 전체 데이터
+export const programBookAtom = atom<ProgramBookDataType>({
+    title: '',
+    description: '',
+    movies: [],
+});
+
+// 현재 작업 중인 영화의 레이아웃 데이터
+export const currentMovieLayoutAtom = atom<MovieLayoutData | null>(null);
+
+// 각 영화별 드래그된 아이템들을 저장하는 atom
+export interface MovieDraggedItems {
+    [movieId: string]: DraggedItemData[];
+}
+
+export const movieDraggedItemsAtom = atom<MovieDraggedItems>({});
+
+// 각 영화별 선택된 레이아웃을 저장하는 atom
+export interface MovieLayouts {
+    [movieId: string]: string; // movieId -> layoutId mapping
+}
+
+export const movieLayoutsAtom = atom<MovieLayouts>({});
+
+export interface MovieData {
+    id: string;
+    title: string;
+    posterPath: string;
+    overview: string;
+    releaseDate: string;
+    layoutId: string;
+    analysisResults: AnalysisResult[];
+}
+
+export interface AnalysisResult {
+    id: string;
+    type: string;
+    content: string;
+    zone?: string;
+}
+
+// PDF 파일 경로를 저장하는 atom
+export const pdfFilePathAtom = atom<string>('');
+
+export const selectedLayoutAtom = atom<string>('1'); // 기본 레이아웃

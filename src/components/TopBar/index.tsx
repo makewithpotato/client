@@ -1,4 +1,4 @@
-import { Wrapper, Logo, Nav, NavLink, NewProjectButton, RightBox, IconButton, ProfileImg } from './index.styled';
+import { Wrapper, Logo, Nav, NavLink, RightBox, IconButton, ProfileImg } from './index.styled';
 
 export const TopBar = () => (
     <Wrapper>
@@ -8,7 +8,7 @@ export const TopBar = () => (
                 <NavLink to="/">Home</NavLink>
                 <NavLink to="/myprogrambooks">My Program Books</NavLink>
                 <NavLink to="/mymovies">My Movies</NavLink>
-                <NewProjectButton>New Project</NewProjectButton>
+                <NavLink to="/newprogrambook/select">New Program Book</NavLink>
             </Nav>
             <RightBox>
                 <IconButton>?</IconButton>
