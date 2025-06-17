@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal } from '../Modal';
+import { Modal } from '@/components';
 import { ModalTitle, Input, ButtonContainer, SaveButton, CancelButton } from './index.styled';
 
 interface ProgramBookTitleModalProps {

@@ -1,52 +1,27 @@
-import { useAtom } from 'jotai';
-import { selectedMoviesAtom, currentMovieIndexAtom } from '@/atoms';
-import {
-    MovieInfoContainer,
-    MovieImage,
-    MovieInfo,
-    MovieTitle,
-    MovieProgress,
-    ButtonGroup,
-    MovieButton,
-} from './index.styled';
+import React from 'react';
+import { Card, MoviePoster, MovieInfo, MovieTitle, MovieOverview, MovieReleaseDate } from './index.styled';
+import type { MovieData } from '@/atoms/programBook';
 
-export const MovieInfoCard = () => {
-    const [selectedMovies] = useAtom(selectedMoviesAtom);
-    const [currentMovieIndex, setCurrentMovieIndex] = useAtom(currentMovieIndexAtom);
+interface MovieInfoCardProps {
+    movie: MovieData;
+    isSelected: boolean;
+    onClick: () => void;
+}
 
-    const handlePreviousMovie = () => {
-        setCurrentMovieIndex(Math.max(0, currentMovieIndex - 1));
+export const MovieInfoCard: React.FC<MovieInfoCardProps> = ({ movie, isSelected, onClick }) => {
+    const handleClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        onClick();
     };
-
-    const handleNextMovie = () => {
-        setCurrentMovieIndex(Math.min(selectedMovies.length - 1, currentMovieIndex + 1));
-    };
-
-    const currentMovie = selectedMovies[currentMovieIndex];
-
-    if (!selectedMovies.length || !currentMovie) {
-        return null;
-    }
 
     return (
-        <MovieInfoContainer>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <MovieImage src={currentMovie.image} alt={currentMovie.title} />
-                <MovieInfo>
-                    <MovieTitle>{currentMovie.title}</MovieTitle>
-                    <MovieProgress>
-                        Movie {currentMovieIndex + 1} of {selectedMovies.length}
-                    </MovieProgress>
-                </MovieInfo>
-            </div>
-            <ButtonGroup>
-                <MovieButton onClick={handlePreviousMovie} disabled={currentMovieIndex === 0}>
-                    Previous Movie
-                </MovieButton>
-                <MovieButton onClick={handleNextMovie} disabled={currentMovieIndex === selectedMovies.length - 1}>
-                    Next Movie
-                </MovieButton>
-            </ButtonGroup>
-        </MovieInfoContainer>
+        <Card isSelected={isSelected} onClick={handleClick} role="button" tabIndex={0}>
+            <MoviePoster src={movie.posterPath} alt={movie.title} />
+            <MovieInfo>
+                <MovieTitle>{movie.title}</MovieTitle>
+                <MovieReleaseDate>{movie.releaseDate}</MovieReleaseDate>
+                <MovieOverview>{movie.overview}</MovieOverview>
+            </MovieInfo>
+        </Card>
     );
 };

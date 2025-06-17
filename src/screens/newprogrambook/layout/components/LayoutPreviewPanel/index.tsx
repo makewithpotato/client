@@ -1,84 +1,133 @@
 import { useAtom } from 'jotai';
-import { currentLayoutIndexAtom } from '@/atoms';
-import type { LayoutOption } from '../../types';
+import { movieLayoutsAtom, movieDraggedItemsAtom } from '@/atoms/programBook';
+import { currentMovieIndexAtom } from '@/atoms';
+import { programBookAtom } from '@/atoms/programBook';
+import type { DraggedItemData } from '@/screens/newprogrambook/layout/types';
 import {
-    LayoutSection,
+    Panel,
+    Title,
+    LayoutGrid,
+    LayoutOption,
+    LayoutImage,
     LayoutTitle,
-    LayoutPreview,
-    PreviewContent,
-    ButtonContainer,
-    LayoutButton,
-    LayoutInfo,
-    LayoutName,
-    LayoutDescription,
+    PreviewPanel,
+    DropZone,
+    DropZoneTitle,
+    AnalysisItem,
+    AnalysisTitle,
+    AnalysisContent,
+    DeleteButton,
 } from './index.styled';
 
-const layoutOptions: LayoutOption[] = [
-    {
-        id: 0,
-        name: '클래식 레이아웃',
-        description: '전통적인 세로 배치로 깔끔하고 정돈된 느낌',
-    },
-    {
-        id: 1,
-        name: '모던 그리드',
-        description: '격자 형태로 정보를 효율적으로 배치',
-    },
-    {
-        id: 2,
-        name: '매거진 스타일',
-        description: '잡지 같은 자유로운 레이아웃',
-    },
-    {
-        id: 3,
-        name: '미니멀 디자인',
-        description: '간결하고 세련된 미니멀 스타일',
-    },
-    {
-        id: 4,
-        name: '컴팩트 뷰',
-        description: '정보를 압축적으로 표현하는 레이아웃',
-    },
+interface Layout {
+    id: string;
+    title: string;
+    image: string;
+    zones: string[];
+}
+
+const LAYOUTS: Layout[] = [
+    { id: '1', title: 'Basic Layout', image: '/layouts/basic.png', zones: ['top', 'middle', 'bottom'] },
+    { id: '2', title: 'Poster Layout', image: '/layouts/poster.png', zones: ['left', 'right'] },
+    { id: '3', title: 'Text Layout', image: '/layouts/text.png', zones: ['header', 'content', 'footer'] },
 ];
 
 export const LayoutPreviewPanel = () => {
-    const [currentLayoutIndex, setCurrentLayoutIndex] = useAtom(currentLayoutIndexAtom);
+    const [movieLayouts, setMovieLayouts] = useAtom(movieLayoutsAtom);
+    const [movieDraggedItems, setMovieDraggedItems] = useAtom(movieDraggedItemsAtom);
+    const [currentMovieIndex] = useAtom(currentMovieIndexAtom);
+    const [programBook] = useAtom(programBookAtom);
 
-    const handlePreviousLayout = () => {
-        setCurrentLayoutIndex(Math.max(0, currentLayoutIndex - 1));
+    const currentMovie = programBook.movies[currentMovieIndex];
+    const currentLayoutId = currentMovie ? movieLayouts[currentMovie.movieId] || '1' : '1';
+    const currentLayout = LAYOUTS.find((l) => l.id === currentLayoutId) || LAYOUTS[0];
+    const currentItems = currentMovie ? movieDraggedItems[currentMovie.movieId] || [] : [];
+
+    const handleLayoutSelect = (layoutId: string) => {
+        if (!currentMovie) return;
+        setMovieLayouts((prev) => ({
+            ...prev,
+            [currentMovie.movieId]: layoutId,
+        }));
     };
 
-    const handleNextLayout = () => {
-        setCurrentLayoutIndex(Math.min(layoutOptions.length - 1, currentLayoutIndex + 1));
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>, zone: string) => {
+        e.preventDefault();
+        if (!currentMovie) return;
+
+        try {
+            const item = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const newItem: DraggedItemData = { ...item, type: 'analysis' as const, zone };
+
+            setMovieDraggedItems((prev) => ({
+                ...prev,
+                [currentMovie.movieId]: [...(prev[currentMovie.movieId] || []), newItem],
+            }));
+        } catch (error) {
+            console.error('Failed to parse dragged item:', error);
+        }
     };
 
-    const currentLayout = layoutOptions[currentLayoutIndex];
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+    };
+
+    const handleDelete = (itemId: string, zone: string) => {
+        if (!currentMovie) return;
+
+        setMovieDraggedItems((prev) => ({
+            ...prev,
+            [currentMovie.movieId]: (prev[currentMovie.movieId] || []).filter(
+                (item) => !(item.id === itemId && item.zone === zone)
+            ),
+        }));
+    };
+
+    const renderDropZone = (zone: string, title: string) => {
+        const zoneItems = currentItems.filter((item) => item.zone === zone);
+
+        return (
+            <DropZone onDrop={(e) => handleDrop(e, zone)} onDragOver={handleDragOver}>
+                <DropZoneTitle>{title}</DropZoneTitle>
+                {zoneItems.map((item, index) => (
+                    <AnalysisItem key={`${item.id}-${index}`}>
+                        <AnalysisTitle>{item.type}</AnalysisTitle>
+                        <AnalysisContent>{item.content}</AnalysisContent>
+                        <DeleteButton onClick={() => handleDelete(item.id, zone)}>×</DeleteButton>
+                    </AnalysisItem>
+                ))}
+            </DropZone>
+        );
+    };
+
+    if (!currentMovie) {
+        return (
+            <Panel>
+                <Title>Layout Preview</Title>
+                <p>Please select a movie to edit its layout.</p>
+            </Panel>
+        );
+    }
 
     return (
-        <LayoutSection>
-            <LayoutTitle>Select Layout</LayoutTitle>
+        <Panel>
+            <Title>Layout Preview - {currentMovie.movie.title}</Title>
+            <LayoutGrid>
+                {LAYOUTS.map((layout) => (
+                    <LayoutOption
+                        key={layout.id}
+                        isSelected={currentLayoutId === layout.id}
+                        onClick={() => handleLayoutSelect(layout.id)}
+                    >
+                        <LayoutImage src={layout.image} alt={layout.title} />
+                        <LayoutTitle>{layout.title}</LayoutTitle>
+                    </LayoutOption>
+                ))}
+            </LayoutGrid>
 
-            <LayoutPreview>
-                <PreviewContent>
-                    Layout Preview
-                    <br />
-                    {currentLayoutIndex + 1} / {layoutOptions.length}
-                </PreviewContent>
-            </LayoutPreview>
-
-            <LayoutInfo>
-                <LayoutName>{currentLayout.name}</LayoutName>
-                <LayoutDescription>{currentLayout.description}</LayoutDescription>
-            </LayoutInfo>
-
-            <ButtonContainer>
-                <LayoutButton onClick={handlePreviousLayout} disabled={currentLayoutIndex === 0}>
-                    Previous Layout
-                </LayoutButton>
-                <LayoutButton onClick={handleNextLayout} disabled={currentLayoutIndex === layoutOptions.length - 1}>
-                    Next Layout
-                </LayoutButton>
-            </ButtonContainer>
-        </LayoutSection>
+            <PreviewPanel>
+                {currentLayout.zones.map((zone) => renderDropZone(zone, zone.charAt(0).toUpperCase() + zone.slice(1)))}
+            </PreviewPanel>
+        </Panel>
     );
 };

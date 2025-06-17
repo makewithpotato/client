@@ -1,59 +1,76 @@
 import styled from 'styled-components';
 
-export const MovieInfoContainer = styled.div`
+interface CardProps {
+    isSelected?: boolean;
+}
+
+export const Card = styled.div<CardProps>`
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 20px 0;
-    padding: 16px;
+    padding: 20px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid ${(props) => (props.isSelected ? '#007AFF' : 'transparent')};
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
 `;
 
-export const MovieImage = styled.img`
-    width: 60px;
-    height: 80px;
+export const MoviePoster = styled.img`
+    width: 120px;
+    height: 180px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: 8px;
+    margin-right: 20px;
 `;
 
 export const MovieInfo = styled.div`
+    flex: 1;
     display: flex;
     flex-direction: column;
 `;
 
 export const MovieTitle = styled.h3`
-    margin: 0 0 4px 0;
     font-size: 18px;
     font-weight: 600;
-    color: #222;
+    color: #333;
+    margin: 0 0 8px;
 `;
 
-export const MovieProgress = styled.p`
-    margin: 0;
+export const MovieReleaseDate = styled.p`
+    font-size: 14px;
     color: #666;
-    font-size: 14px;
+    margin: 0 0 12px;
 `;
 
-export const ButtonGroup = styled.div`
-    display: flex;
-    gap: 8px;
+export const MovieOverview = styled.p`
+    font-size: 14px;
+    line-height: 1.5;
+    color: #444;
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 `;
 
-export const MovieButton = styled.button<{ disabled?: boolean }>`
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: white;
-    color: #222;
-    font-size: 14px;
-    cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-    opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
-    transition: all 0.2s;
+export const LayoutButton = styled.button`
+    background: #007aff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background 0.2s;
 
     &:hover {
-        background: ${({ disabled }) => (disabled ? 'white' : '#f5f5f5')};
-        border-color: ${({ disabled }) => (disabled ? '#ddd' : '#bbb')};
+        background: #0056b3;
     }
 `;
