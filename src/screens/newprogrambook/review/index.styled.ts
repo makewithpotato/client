@@ -1,42 +1,40 @@
 import styled from 'styled-components';
 
 export const Wrapper = styled.div`
-    background: #fcf7f7;
     min-height: 100vh;
+    background-color: #f5f5f5;
 `;
 
 export const Section = styled.section`
+    max-width: 1200px;
     margin: 0 auto;
-    max-width: 1400px;
-    padding: 40px 24px;
+    padding: 24px;
 `;
 
 export const Header = styled.div`
+    margin-bottom: 24px;
     text-align: center;
-    margin-bottom: 40px;
 `;
 
 export const Title = styled.h1`
-    font-family: 'Plus Jakarta Sans', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
-    font-weight: bold;
-    font-size: 36px;
-    margin: 0 0 16px 0;
-    color: #222;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
 `;
 
 export const Description = styled.p`
     font-size: 16px;
     color: #666;
-    margin: 0;
 `;
 
 export const ViewerContainer = styled.div`
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
+    width: 100%;
+    height: 70vh;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 `;
 
 export const PageViewer = styled.div`
@@ -109,25 +107,25 @@ export const PrintContainer = styled.div`
 `;
 
 export const DownloadContainer = styled.div`
-    text-align: center;
-
-    @media print {
-        display: none;
-    }
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 `;
 
 export const DownloadButton = styled.button`
-    background: #e74c3c;
+    display: block;
+    margin: 24px auto 0;
+    padding: 12px 24px;
+    border-radius: 4px;
+    background-color: #007aff;
     color: white;
     border: none;
-    border-radius: 8px;
-    padding: 16px 32px;
-    font-weight: 600;
     font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.3s ease;
 
     &:hover {
-        background: #c0392b;
+        background-color: #0056b3;
     }
 `;
