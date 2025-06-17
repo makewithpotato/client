@@ -5,6 +5,8 @@ export interface SelectedMovie {
     id: string;
     title: string;
     image: string;
+    overview: string;
+    releaseDate: string;
 }
 
 // 선택한 영화들을 저장하는 atom
