@@ -2,46 +2,60 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { TopBar, SearchBar } from '@/components';
-import { Wrapper, Section, MovieGrid, NextButtonWrapper, NextButton } from './inde.styled';
+import { Wrapper, Section, MovieGrid, NextButtonWrapper, NextButton } from './index.styled';
 import { MovieSelectCard, TabBar, Pagination } from './components';
 import { selectedMoviesAtom } from '@/atoms';
+import { programBookAtom } from '@/atoms/programBook';
 
 const movies = [
     {
         id: '1',
         image: '/movie-posters/enchanted-forest.jpg',
         title: 'The Enchanted Forest',
+        overview: 'A magical journey through an enchanted forest filled with mystical creatures.',
+        releaseDate: '2024',
     },
     {
         id: '2',
         image: '/movie-posters/lost-city.jpg',
         title: 'The Lost City',
+        overview: 'An adventure to find a legendary lost city hidden in the depths of the jungle.',
+        releaseDate: '2024',
     },
     {
         id: '3',
         image: '/movie-posters/crimson-tide.jpg',
         title: 'The Crimson Tide',
+        overview: 'A thrilling naval drama about submarine warfare and moral decisions.',
+        releaseDate: '2024',
     },
     {
         id: '4',
         image: '/movie-posters/whispers.jpg',
         title: 'Whispers of the Past',
+        overview: 'A haunting tale of memories and secrets that refuse to stay buried.',
+        releaseDate: '2024',
     },
     {
         id: '5',
         image: '/movie-posters/echoes.jpg',
         title: 'Echoes of Tomorrow',
+        overview: 'A sci-fi epic about the consequences of time travel and human choices.',
+        releaseDate: '2024',
     },
     {
         id: '6',
         image: '/movie-posters/symphony.jpg',
         title: 'The Silent Symphony',
+        overview: 'A moving story about a deaf musician who changes the world through music.',
+        releaseDate: '2024',
     },
 ];
 
 export const SelectMoviesScreen = () => {
     const navigate = useNavigate();
     const [selectedMovies, setSelectedMovies] = useAtom(selectedMoviesAtom);
+    const [, setProgramBook] = useAtom(programBookAtom);
     const [search, setSearch] = useState('');
     const [activeTab, setActiveTab] = useState<'all' | 'shared'>('all');
     const [currentPage, setCurrentPage] = useState(1);
@@ -55,15 +69,40 @@ export const SelectMoviesScreen = () => {
             if (isSelected) {
                 return prev.filter((m) => m.id !== movieId);
             } else {
-                return [...prev, { id: movie.id, title: movie.title, image: movie.image }];
+                return [
+                    ...prev,
+                    {
+                        id: movie.id,
+                        title: movie.title,
+                        image: movie.image,
+                        overview: movie.overview,
+                        releaseDate: movie.releaseDate,
+                    },
+                ];
             }
         });
     };
 
     const handleNext = () => {
         if (selectedMovies.length > 0) {
-            console.log('Selected movies:', selectedMovies);
-            // layout 페이지로 이동 (선택된 영화는 atom에 저장되어 있음)
+            // Update programBook with selected movies before navigation
+            setProgramBook((prev) => ({
+                ...prev,
+                movies: selectedMovies.map((movie) => ({
+                    movieId: movie.id,
+                    movie: {
+                        id: movie.id,
+                        title: movie.title,
+                        posterPath: movie.image,
+                        overview: movie.overview,
+                        releaseDate: movie.releaseDate,
+                        analysisResults: [],
+                    },
+                    layout: 'basic',
+                    layoutId: '1',
+                    draggedItems: [],
+                })),
+            }));
             navigate('/newprogrambook/layout');
         }
     };
@@ -92,7 +131,7 @@ export const SelectMoviesScreen = () => {
                 <Pagination current={currentPage} total={10} onPage={setCurrentPage} />
             </Section>
             <NextButtonWrapper>
-                <NextButton disabled={selectedMovies.length === 0} onClick={handleNext}>
+                <NextButton disabled={selectedMovies.length === 0} onClick={handleNext} aria-label="Next page">
                     Next
                 </NextButton>
             </NextButtonWrapper>

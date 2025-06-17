@@ -1,31 +1,47 @@
 import styled from 'styled-components';
 
-export const Card = styled.div<{ selected?: boolean }>`
+export const Card = styled.div<{ selected: boolean }>`
+    position: relative;
     width: 200px;
-    display: flex;
-    flex-direction: column;
+    height: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid ${({ selected }) => (selected ? '#007AFF' : 'transparent')};
+`;
+
+export const Image = styled.img`
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+`;
+
+export const Title = styled.h3`
+    margin: 8px;
+    font-size: 16px;
+    text-align: center;
+    color: #333;
+`;
+
+interface SelectButtonProps {
+    selected?: boolean;
+}
+
+export const SelectButton = styled.button<SelectButtonProps>`
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 12px;
+    border-radius: 4px;
+    background-color: ${({ selected }) => (selected ? '#007AFF' : '#E0E0E0')};
+    color: ${({ selected }) => (selected ? '#FFFFFF' : '#333333')};
+    border: none;
     cursor: pointer;
-    transition: transform 0.2s;
-    border: 3px solid ${({ selected }) => (selected ? '#a14d4d' : 'transparent')};
-    border-radius: 12px;
-    padding: 4px;
+    transition: all 0.3s ease;
 
     &:hover {
-        transform: translateY(-4px);
+        background-color: ${({ selected }) => (selected ? '#0056B3' : '#CCCCCC')};
     }
-`;
-
-export const Poster = styled.img`
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-    border-radius: 8px;
-`;
-
-export const Title = styled.div`
-    font-weight: 600;
-    color: #222;
-    margin-top: 12px;
-    text-align: center;
-    font-size: 14px;
 `;
