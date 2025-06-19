@@ -71,7 +71,9 @@ export const SelectMoviesScreen = () => {
 
     // 페이지당 아이템 수
     const itemsPerPage = 10;
-    const filteredMovies = movies.filter((movie) => movie.title.toLowerCase().includes(search.toLowerCase()));
+    const filteredMovies = movies.filter(
+        (movie) => movie.title.toLowerCase().includes(search.toLowerCase()) && movie.status === 'COMPLETE'
+    );
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginatedMovies = filteredMovies.slice(startIndex, startIndex + itemsPerPage);
 

@@ -18,6 +18,7 @@ import {
     AnalysisContent,
     DeleteButton,
 } from './index.styled';
+import layout1 from '@/assets/images/layouts/layout1.svg';
 
 interface Layout {
     id: string;
@@ -30,8 +31,8 @@ const LAYOUTS: Layout[] = [
     {
         id: '1',
         title: 'Two Page Layout',
-        image: '/layouts/two-page.png',
-        zones: ['mainImage', 'secondImage', 'director', 'synopsis', 'review'],
+        image: layout1,
+        zones: ['Main Image', 'Sub Image', 'First Section', 'Second Section', 'Third Section'],
     },
 ];
 
@@ -141,8 +142,7 @@ export const LayoutPreviewPanel = () => {
 
     const renderDropZone = (zone: string, title: string) => {
         const items = currentItems.filter((item) => item.zone === zone);
-        const isImageZone = zone === 'mainImage' || zone === 'secondImage';
-        const maxItems = isImageZone ? 1 : undefined;
+        const isImageZone = zone === 'Main Image' || zone === 'Sub Image';
 
         return (
             <DropZone
@@ -157,7 +157,7 @@ export const LayoutPreviewPanel = () => {
                 onDragOver={handleDragOver}
             >
                 <DropZoneTitle>
-                    {zone === 'mainImage' ? 'Main Image' : zone === 'secondImage' ? 'Second Image' : title}
+                    {zone === 'Main Image' ? 'Main Image' : zone === 'Sub Image' ? 'Sub Image' : title}
                 </DropZoneTitle>
                 {items.map((item, index) => (
                     <AnalysisItem key={index}>
