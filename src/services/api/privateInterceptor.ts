@@ -25,7 +25,7 @@ export const applyPrivateInterceptors = (instance: AxiosInstance) => {
             if (accessToken && config.headers) {
                 config.headers.Authorization = `Bearer ${accessToken}`;
             }
-            console.info('[interceptor] accessToken', accessToken);
+
             logRequest(config);
             return config;
         },

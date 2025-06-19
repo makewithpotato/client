@@ -18,7 +18,6 @@ export const LoginScreen = () => {
 
             try {
                 setMessage({ text: '로그인 처리 중...', isError: false });
-                console.log('Attempting login with code:', code);
                 await googleLogin(code);
                 setMessage({ text: '로그인 성공! 이동합니다.', isError: false });
 
