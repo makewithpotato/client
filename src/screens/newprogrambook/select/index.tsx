@@ -1,72 +1,29 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAtom } from 'jotai';
-import { TopBar, SearchBar } from '@/components';
+import { TopBar, SearchBar, Pagination } from '@/components';
 import { Wrapper, Section, MovieGrid, NextButtonWrapper, NextButton } from './index.styled';
-import { MovieSelectCard, TabBar, Pagination } from './components';
+import { MovieSelectCard } from './components';
 import { selectedMoviesAtom } from '@/atoms';
 import { programBookAtom } from '@/atoms/programBook';
-
-const movies = [
-    {
-        id: '1',
-        image: '/movie-posters/enchanted-forest.jpg',
-        title: 'The Enchanted Forest',
-        overview: 'A magical journey through an enchanted forest filled with mystical creatures.',
-        releaseDate: '2024',
-    },
-    {
-        id: '2',
-        image: '/movie-posters/lost-city.jpg',
-        title: 'The Lost City',
-        overview: 'An adventure to find a legendary lost city hidden in the depths of the jungle.',
-        releaseDate: '2024',
-    },
-    {
-        id: '3',
-        image: '/movie-posters/crimson-tide.jpg',
-        title: 'The Crimson Tide',
-        overview: 'A thrilling naval drama about submarine warfare and moral decisions.',
-        releaseDate: '2024',
-    },
-    {
-        id: '4',
-        image: '/movie-posters/whispers.jpg',
-        title: 'Whispers of the Past',
-        overview: 'A haunting tale of memories and secrets that refuse to stay buried.',
-        releaseDate: '2024',
-    },
-    {
-        id: '5',
-        image: '/movie-posters/echoes.jpg',
-        title: 'Echoes of Tomorrow',
-        overview: 'A sci-fi epic about the consequences of time travel and human choices.',
-        releaseDate: '2024',
-    },
-    {
-        id: '6',
-        image: '/movie-posters/symphony.jpg',
-        title: 'The Silent Symphony',
-        overview: 'A moving story about a deaf musician who changes the world through music.',
-        releaseDate: '2024',
-    },
-];
+import { useMovies } from '@/hooks/useMovies';
 
 export const SelectMoviesScreen = () => {
     const navigate = useNavigate();
     const [selectedMovies, setSelectedMovies] = useAtom(selectedMoviesAtom);
     const [, setProgramBook] = useAtom(programBookAtom);
     const [search, setSearch] = useState('');
-    const [activeTab, setActiveTab] = useState<'all' | 'shared'>('all');
     const [currentPage, setCurrentPage] = useState(1);
+    const { movies, isLoading, error, fetchMovies } = useMovies();
 
-    // Reset selected movies when component mounts
+    // Reset selected movies and fetch movies when component mounts
     useEffect(() => {
         setSelectedMovies([]);
-    }, [setSelectedMovies]);
+        fetchMovies();
+    }, [setSelectedMovies, fetchMovies]);
 
     const handleMovieSelect = (movieId: string) => {
-        const movie = movies.find((m) => m.id === movieId);
+        const movie = movies.find((m) => m.movieId.toString() === movieId);
         if (!movie) return;
 
         setSelectedMovies((prev) => {
@@ -77,11 +34,11 @@ export const SelectMoviesScreen = () => {
                 return [
                     ...prev,
                     {
-                        id: movie.id,
+                        id: movieId,
                         title: movie.title,
-                        image: movie.image,
-                        overview: movie.overview,
-                        releaseDate: movie.releaseDate,
+                        image: movie.thumbnailUrl,
+                        overview: movie.director, // 임시로 director를 overview로 사용
+                        releaseDate: movie.releaseDate || '',
                     },
                 ];
             }
@@ -112,7 +69,35 @@ export const SelectMoviesScreen = () => {
         }
     };
 
+    // 페이지당 아이템 수
+    const itemsPerPage = 10;
     const filteredMovies = movies.filter((movie) => movie.title.toLowerCase().includes(search.toLowerCase()));
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedMovies = filteredMovies.slice(startIndex, startIndex + itemsPerPage);
+
+    if (isLoading) {
+        return (
+            <Wrapper>
+                <TopBar />
+                <Section>
+                    <h1>Select Movies</h1>
+                    <div>Loading movies...</div>
+                </Section>
+            </Wrapper>
+        );
+    }
+
+    if (error) {
+        return (
+            <Wrapper>
+                <TopBar />
+                <Section>
+                    <h1>Select Movies</h1>
+                    <div>Error: {error}</div>
+                </Section>
+            </Wrapper>
+        );
+    }
 
     return (
         <Wrapper>
@@ -120,20 +105,24 @@ export const SelectMoviesScreen = () => {
             <Section>
                 <h1>Select Movies</h1>
                 <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
-                <TabBar active={activeTab} onTab={setActiveTab} />
                 <MovieGrid>
-                    {filteredMovies.map((movie) => (
+                    {paginatedMovies.map((movie) => (
                         <MovieSelectCard
-                            key={movie.id}
-                            id={movie.id}
-                            image={movie.image}
+                            key={movie.movieId}
+                            id={movie.movieId.toString()}
+                            image={movie.thumbnailUrl}
                             title={movie.title}
-                            selected={selectedMovies.some((m) => m.id === movie.id)}
+                            selected={selectedMovies.some((m) => m.id === movie.movieId.toString())}
                             onSelect={handleMovieSelect}
                         />
                     ))}
                 </MovieGrid>
-                <Pagination current={currentPage} total={10} onPage={setCurrentPage} />
+                <Pagination
+                    current={currentPage}
+                    total={filteredMovies.length}
+                    onPage={setCurrentPage}
+                    itemsPerPage={itemsPerPage}
+                />
             </Section>
             <NextButtonWrapper>
                 <NextButton disabled={selectedMovies.length === 0} onClick={handleNext} aria-label="Next page">
