@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TopBar, ProgramBookCard, SearchBar, Pagination } from '@/components';
 import { Wrapper, Section, CardGrid } from './index.styled';

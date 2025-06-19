@@ -1,5 +1,3 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
 import { TopBar } from '@/components';
 import { AnalysisItem } from './components/AnalysisItem';
 import { Wrapper, Content, Header, Title, MovieInfo, Divider, Section, SaveButton } from './index.styled';
@@ -35,8 +33,6 @@ const mockAnalysis: MovieAnalysis = {
 };
 
 export const MovieAnalyzeScreen = () => {
-    const { movieId } = useParams<{ movieId: string }>();
-
     const handleEdit = (field: keyof MovieAnalysis) => {
         // TODO: Implement edit functionality
         console.log(`Editing ${field}`);

@@ -10,6 +10,11 @@ interface PaginationProps {
 export const Pagination = ({ current, total, onPage, itemsPerPage = 10 }: PaginationProps) => {
     const totalPages = Math.ceil(total / itemsPerPage);
 
+    // Don't render pagination if there are no pages
+    if (totalPages === 0) {
+        return null;
+    }
+
     const getPageNumbers = () => {
         const pages = [];
         const maxVisiblePages = 5;
@@ -52,8 +57,8 @@ export const Pagination = ({ current, total, onPage, itemsPerPage = 10 }: Pagina
 
     return (
         <PaginationWrapper>
-            <PageButton onClick={() => onPage(current - 1)} disabled={current === 1}>
-                이전
+            <PageButton onClick={() => onPage(current - 1)} disabled={current === 1 || totalPages === 0}>
+                ←
             </PageButton>
 
             {getPageNumbers().map((pageNum, index) =>
@@ -66,8 +71,8 @@ export const Pagination = ({ current, total, onPage, itemsPerPage = 10 }: Pagina
                 )
             )}
 
-            <PageButton onClick={() => onPage(current + 1)} disabled={current === totalPages}>
-                다음
+            <PageButton onClick={() => onPage(current + 1)} disabled={current === totalPages || totalPages === 0}>
+                →
             </PageButton>
         </PaginationWrapper>
     );

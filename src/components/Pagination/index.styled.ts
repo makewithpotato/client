@@ -5,7 +5,11 @@ export const PaginationWrapper = styled.div`
     justify-content: center;
     align-items: center;
     gap: 8px;
-    margin: 20px 0;
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
 `;
 
 export const PageButton = styled.button<{ isActive?: boolean }>`
