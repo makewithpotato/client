@@ -15,8 +15,8 @@ const providerNames = {
 const constructGoogleAuthUrl = () => {
     const baseUrl = import.meta.env.VITE_GOOGLE_AUTH_URL;
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    // 현재 도메인을 기반으로 리다이렉트 URI 구성
-    const redirectUri = `${window.location.origin}/login`;
+    // 환경변수에서 리다이렉트 URI를 가져오거나, 기본값으로 콜백 경로 사용
+    const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/google/callback`;
 
     const params = new URLSearchParams({
         client_id: clientId,

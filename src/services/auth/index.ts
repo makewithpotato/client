@@ -18,12 +18,10 @@ const authInstance = axios.create({
  */
 export const googleLogin = async (code: string): Promise<void> => {
     try {
-        console.log('Sending login request with code:', code);
         const response = await authInstance.get<TAuthResponse>('/api/user/login', {
             params: { code },
         });
 
-        console.log('Login response:', response);
         const { accessToken, refreshToken } = response.data.data;
 
         // 토큰 저장
