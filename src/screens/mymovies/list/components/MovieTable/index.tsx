@@ -1,20 +1,14 @@
 import React from 'react';
 import { TableWrapper, Table, TableHeader, HeaderRow, HeaderCell, TableBody } from './index.styled';
 import { MovieItem } from '../MovieItem';
-
-interface Movie {
-    id: string;
-    title: string;
-    director: string;
-    genre: string;
-    releaseDate: string;
-}
+import type { Movie } from '@/types/movie';
 
 interface MovieTableProps {
     movies: Movie[];
+    onMovieClick?: (movie: Movie) => void;
 }
 
-export const MovieTable: React.FC<MovieTableProps> = ({ movies }) => {
+export const MovieTable: React.FC<MovieTableProps> = ({ movies, onMovieClick }) => {
     return (
         <TableWrapper>
             <Table>
@@ -24,19 +18,12 @@ export const MovieTable: React.FC<MovieTableProps> = ({ movies }) => {
                         <HeaderCell>Director</HeaderCell>
                         <HeaderCell>Genre</HeaderCell>
                         <HeaderCell>Release Date</HeaderCell>
-                        <HeaderCell>Actions</HeaderCell>
+                        <HeaderCell>Status</HeaderCell>
                     </HeaderRow>
                 </TableHeader>
                 <TableBody>
                     {movies.map((movie) => (
-                        <MovieItem
-                            key={movie.id}
-                            id={movie.id}
-                            title={movie.title}
-                            director={movie.director}
-                            genre={movie.genre}
-                            releaseDate={movie.releaseDate}
-                        />
+                        <MovieItem key={movie.movieId} movie={movie} onClick={() => onMovieClick?.(movie)} />
                     ))}
                 </TableBody>
             </Table>

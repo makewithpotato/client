@@ -1,40 +1,41 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MovieRow, MovieCell, MovieTitle, Director, Genre, ReleaseDate, ViewButton } from './index.styled';
+import { MovieRow, MovieCell, MovieTitle, Director, Genre, ReleaseDate } from './index.styled';
+import type { Movie } from '@/types/movie';
 
 export interface MovieItemProps {
-    id: string;
-    title: string;
-    director: string;
-    genre: string;
-    releaseDate: string;
-    onView?: () => void;
+    movie: Movie;
+    onClick?: () => void;
 }
 
-export const MovieItem: React.FC<MovieItemProps> = ({ id, title, director, genre, releaseDate }) => {
-    const navigate = useNavigate();
-
-    const handleAnalyze = () => {
-        navigate(`/mymovies/analyze/${id}`);
+export const MovieItem: React.FC<MovieItemProps> = ({ movie, onClick }) => {
+    const getStatusText = (status: Movie['status']) => {
+        switch (status) {
+            case 'UPLOADING':
+                return 'Preparing...';
+            case 'ANALYZE':
+                return 'Ready to Analyze';
+            case 'COMPLETE':
+                return 'Completed';
+            default:
+                return status;
+        }
     };
 
     return (
-        <MovieRow>
+        <MovieRow onClick={onClick} style={{ cursor: movie.status === 'ANALYZE' ? 'pointer' : 'default' }}>
             <MovieCell>
-                <MovieTitle>{title}</MovieTitle>
+                <MovieTitle>{movie.title}</MovieTitle>
             </MovieCell>
             <MovieCell>
-                <Director>{director}</Director>
+                <Director>{movie.director}</Director>
             </MovieCell>
             <MovieCell>
-                <Genre>{genre}</Genre>
+                <Genre>{movie.genre}</Genre>
             </MovieCell>
             <MovieCell>
-                <ReleaseDate>{releaseDate}</ReleaseDate>
+                <ReleaseDate>{movie.releaseDate || 'N/A'}</ReleaseDate>
             </MovieCell>
-            <MovieCell>
-                <ViewButton onClick={handleAnalyze}>Analyze</ViewButton>
-            </MovieCell>
+            <MovieCell>{getStatusText(movie.status)}</MovieCell>
         </MovieRow>
     );
 };
