@@ -7,7 +7,7 @@ export const TopBar = () => (
             <Nav>
                 <NavLink to="/">Home</NavLink>
                 <NavLink to="/myprogrambooks">My Program Books</NavLink>
-                <NavLink to="/mymovies">My Movies</NavLink>
+                <NavLink to="/mymovies/list">My Movies</NavLink>
                 <NavLink to="/newprogrambook/select">New Program Book</NavLink>
             </Nav>
             <RightBox>
