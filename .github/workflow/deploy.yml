@@ -1,4 +1,4 @@
-name: Front Deployment
+name: deploy
 
 # trigger가 되길 바라는 action을 입력. push / pull_request가 있다.
 # 난 main브랜치에 push가 되면 actions을 실행하도록 설정함.
