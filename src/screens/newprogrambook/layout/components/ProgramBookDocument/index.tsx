@@ -16,7 +16,12 @@ export const ProgramBookDocument: React.FC<ProgramBookDocumentProps> = ({ data }
     const movieLayoutData = data.movies.map((movie): MovieLayoutData => {
         if ('layout' in movie) {
             // Need to transform the movie data to match the expected type
-            const layoutData = movie as unknown as { movieId: string; movie: MovieData; layout: string };
+            const layoutData = movie as unknown as {
+                movieId: string;
+                movie: MovieData;
+                layout: string;
+                draggedItems?: { id: string; title: string; content: string; zone: string }[];
+            };
             return {
                 movieId: layoutData.movieId,
                 movie: {
@@ -32,12 +37,14 @@ export const ProgramBookDocument: React.FC<ProgramBookDocumentProps> = ({ data }
                     genres: [],
                 },
                 layoutId: '1',
-                draggedItems: layoutData.movie.analysisResults.map((result) => ({
-                    id: result.id,
-                    title: result.type,
-                    content: result.content,
-                    zone: 'default',
-                })),
+                draggedItems:
+                    layoutData.draggedItems ||
+                    layoutData.movie.analysisResults.map((result) => ({
+                        id: result.id,
+                        title: result.type,
+                        content: result.content,
+                        zone: layoutData.draggedItems?.find((item) => item.id === result.id)?.zone || 'default',
+                    })),
             };
         }
         const movieData = movie as MovieData;
@@ -69,7 +76,7 @@ export const ProgramBookDocument: React.FC<ProgramBookDocumentProps> = ({ data }
         <Document>
             <CoverPage title={data.title} />
             {movieLayoutData.map((movie, index) => (
-                <MoviePage key={movie.movieId} movieData={movie} pageNumber={index + 2} totalPages={totalPages} />
+                <MoviePage key={movie.movieId} movie={movie} pageNumber={index + 2} totalPages={totalPages} />
             ))}
         </Document>
     );
