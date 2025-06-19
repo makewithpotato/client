@@ -18,6 +18,7 @@ import { programBookAtom, movieLayoutsAtom, movieDraggedItemsAtom, pdfFilePathAt
 import { currentMovieIndexAtom } from '@/atoms';
 import type { ProgramBookData } from '@/types/programBook';
 import { generateAndSavePDF } from '@/utils/pdf.tsx';
+import { useCreateProgramBook } from '@/hooks/useCreateProgramBook';
 
 export const LayoutScreen = () => {
     const navigate = useNavigate();
@@ -28,6 +29,7 @@ export const LayoutScreen = () => {
     const [, setPdfFilePath] = useAtom(pdfFilePathAtom);
     const [isTitleModalOpen, setIsTitleModalOpen] = useState(false);
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+    const { createProgramBook, isLoading: isUploading, error: uploadError } = useCreateProgramBook();
 
     // Reset currentMovieIndex when movies change
     useEffect(() => {
@@ -76,8 +78,6 @@ export const LayoutScreen = () => {
             };
             setProgramBook(updatedProgramBook);
 
-            console.log('Generating PDF for:', updatedProgramBook);
-
             // Generate PDF and store the blob
             const { blob, filename } = await generateAndSavePDF(updatedProgramBook);
 
@@ -85,24 +85,36 @@ export const LayoutScreen = () => {
                 throw new Error('PDF blob is null or undefined');
             }
 
-            console.log('PDF generated successfully, blob size:', blob.size);
+            // Create a File object from the blob
+            const pdfFile = new File([blob], filename, { type: 'application/pdf' });
 
-            // Store the blob directly for preview
+            // Upload to server
+            const uploadSuccess = await createProgramBook({
+                title,
+                pdfFile,
+            });
+
+            if (!uploadSuccess) {
+                throw new Error(uploadError || '프로그램북 업로드에 실패했습니다.');
+            }
+
+            // Store the blob for preview
             const pdfUrl = URL.createObjectURL(blob);
-            console.log('Created blob URL:', pdfUrl);
             setPdfFilePath(pdfUrl);
 
             // Store the filename
             sessionStorage.setItem('pdfFilename', filename);
 
-            // Store blob size for verification
-            sessionStorage.setItem('pdfBlobSize', blob.size.toString());
-
             // Navigate to review screen with blob data
             navigate('/newprogrambook/review', { state: { pdfBlob: blob } });
         } catch (error) {
-            console.error('Failed to generate PDF:', error);
-            alert('PDF 생성에 실패했습니다. 다시 시도해주세요.');
+            console.error('Failed to generate or upload PDF:', error);
+            // 성공 메시지가 아닌 경우에만 에러 알림을 표시
+            if (!(error instanceof Error && error.message === '요청이 성공했습니다.')) {
+                alert(
+                    error instanceof Error ? error.message : 'PDF 생성 또는 업로드에 실패했습니다. 다시 시도해주세요.'
+                );
+            }
         } finally {
             setIsGeneratingPDF(false);
         }
@@ -150,8 +162,8 @@ export const LayoutScreen = () => {
                     </RightPanel>
                 </PanelsSection>
 
-                <SaveButton onClick={handleSave} disabled={isGeneratingPDF}>
-                    {isGeneratingPDF ? 'Generating PDF...' : 'Save and Continue'}
+                <SaveButton onClick={handleSave} disabled={isGeneratingPDF || isUploading}>
+                    {isGeneratingPDF ? 'Generating PDF...' : isUploading ? 'Uploading...' : 'Save and Continue'}
                 </SaveButton>
             </Content>
 

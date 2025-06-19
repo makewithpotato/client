@@ -4,6 +4,7 @@ import { TopBar } from '@/components';
 import type { MovieFormData } from './type';
 import { INITIAL_FORM_DATA } from './type';
 import { MovieForm, LoadingScreen } from './components';
+import { useMovieUpload } from '@/hooks/useMovieUpload';
 import {
     Wrapper,
     Content,
@@ -27,13 +28,12 @@ export const MovieUploadScreen = () => {
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [formData, setFormData] = useState<MovieFormData>(INITIAL_FORM_DATA);
     const [videoUrl, setVideoUrl] = useState<string>('');
-    const [isUploading, setIsUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { uploadMovie, isLoading, error, progress } = useMovieUpload();
 
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            if (isUploading) {
+            if (isLoading) {
                 e.preventDefault();
                 e.returnValue = '';
             }
@@ -43,7 +43,7 @@ export const MovieUploadScreen = () => {
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, [isUploading]);
+    }, [isLoading]);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -53,6 +53,13 @@ export const MovieUploadScreen = () => {
     };
 
     const handleFile = (file: File) => {
+        // 파일 크기 체크 (5GB)
+        const maxSize = 5 * 1024 * 1024 * 1024; // 5GB in bytes
+        if (file.size > maxSize) {
+            alert('File size exceeds 5GB limit');
+            return;
+        }
+
         if (file.type.startsWith('video/')) {
             setUploadedFile(file);
             const url = URL.createObjectURL(file);
@@ -90,25 +97,7 @@ export const MovieUploadScreen = () => {
         }));
     };
 
-    const simulateUpload = () => {
-        setIsUploading(true);
-        let progress = 0;
-
-        const interval = setInterval(() => {
-            progress += 5;
-            setUploadProgress(progress);
-
-            if (progress >= 100) {
-                clearInterval(interval);
-                setTimeout(() => {
-                    setIsUploading(false);
-                    navigate('/mymovies/list');
-                }, 500);
-            }
-        }, 200);
-    };
-
-    const handleNext = () => {
+    const handleNext = async () => {
         if (
             uploadedFile &&
             formData.title &&
@@ -117,15 +106,31 @@ export const MovieUploadScreen = () => {
             formData.releaseDate &&
             formData.cast
         ) {
-            // TODO: Replace with actual upload logic
-            simulateUpload();
+            try {
+                const result = await uploadMovie({
+                    title: formData.title,
+                    director: formData.director,
+                    genre: formData.genre,
+                    releaseDate: formData.releaseDate,
+                    actor: formData.cast,
+                    file: uploadedFile,
+                });
+
+                if (result.success) {
+                    navigate('/mymovies/list');
+                } else {
+                    throw new Error(error || '업로드에 실패했습니다.');
+                }
+            } catch (err) {
+                alert(err instanceof Error ? err.message : '업로드 중 오류가 발생했습니다.');
+            }
         } else {
             alert('Please fill in all required fields');
         }
     };
 
-    if (isUploading) {
-        return <LoadingScreen progress={uploadProgress} />;
+    if (isLoading) {
+        return <LoadingScreen progress={progress} />;
     }
 
     return (
@@ -165,11 +170,12 @@ export const MovieUploadScreen = () => {
                         !formData.director ||
                         !formData.genre ||
                         !formData.releaseDate ||
-                        !formData.cast
+                        !formData.cast ||
+                        isLoading
                     }
                     onClick={handleNext}
                 >
-                    Next
+                    {isLoading ? 'Uploading...' : 'Next'}
                 </NextButton>
             </NextButtonWrapper>
         </Wrapper>

@@ -1,131 +1,59 @@
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background: #f8f9fa;
 `;
 
 export const Section = styled.section`
     max-width: 1200px;
     margin: 0 auto;
-    padding: 24px;
-`;
-
-export const Header = styled.div`
-    margin-bottom: 24px;
-    text-align: center;
+    padding: 40px 20px;
 `;
 
 export const Title = styled.h1`
-    font-size: 24px;
+    font-size: 32px;
     font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
+    margin: 0 0 12px 0;
+    color: #111;
 `;
 
 export const Description = styled.p`
     font-size: 16px;
     color: #666;
+    margin: 0 0 40px 0;
 `;
 
-export const ViewerContainer = styled.div`
-    width: 100%;
-    height: 70vh;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-`;
-
-export const PageViewer = styled.div`
-    width: 100%;
-    height: 1587px;
-    max-width: 100vw;
-    max-height: 80vh;
-    aspect-ratio: 2/1.414;
-    overflow: hidden;
-    position: relative;
-    background: #f8f8f8;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
-
-export const PagesContainer = styled.div`
-    height: 100%;
-    display: flex;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-`;
-
-export const NavigationContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
+export const Container = styled.div`
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    background: #f8f8f8;
-    border-top: 1px solid #e0e0e0;
-
-    @media print {
-        display: none;
-    }
-`;
-
-export const NavButton = styled.button<{ disabled?: boolean }>`
-    background: ${({ disabled }) => (disabled ? '#f0f0f0' : '#4CAF50')};
-    color: ${({ disabled }) => (disabled ? '#999' : 'white')};
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-    transition: all 0.2s;
-    font-size: 16px;
-    font-weight: bold;
-
-    &:hover {
-        background: ${({ disabled }) => (disabled ? '#f0f0f0' : '#45a049')};
-        transform: ${({ disabled }) => (disabled ? 'none' : 'scale(1.05)')};
-    }
-`;
-
-export const PageIndicator = styled.div`
-    font-size: 14px;
-    color: #666;
-    font-weight: 500;
-    min-width: 60px;
-    text-align: center;
-`;
-
-export const PrintContainer = styled.div`
-    display: none;
-
-    @media print {
-        display: block;
-    }
-`;
-
-export const DownloadContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+    height: 800px;
+    margin-bottom: 24px;
 `;
 
 export const DownloadButton = styled.button`
-    display: block;
-    margin: 24px auto 0;
-    padding: 12px 24px;
-    border-radius: 4px;
-    background-color: #007aff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0 24px;
+    background: #e11d48;
     color: white;
     border: none;
+    border-radius: 8px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.2s;
 
     &:hover {
-        background-color: #0056b3;
+        background: #be123c;
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
     }
 `;

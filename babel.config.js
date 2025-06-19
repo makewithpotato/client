@@ -1,12 +1,12 @@
 module.exports = {
-    presets: ['module:@react-native/babel-preset'],
+    presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
     plugins: [
         // * 각 폴더 별 별칭 설정 * //
         [
             'module-resolver',
             {
                 root: ['./src'],
-                extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
+                extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
                 alias: {
                     '@': './src',
                     '@assets': './src/assets',
@@ -27,13 +27,12 @@ module.exports = {
         ],
         // * 환경변수 설정을 위한 설정 추가 * //
         [
-            'module:react-native-dotenv',
+            'dotenv',
             {
                 path: '.env',
                 safe: true,
                 allowUndefined: true,
             },
         ],
-        ['react-native-reanimated/plugin'],
     ],
 };

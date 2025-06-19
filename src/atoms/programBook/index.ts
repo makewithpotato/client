@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 import type { MovieLayoutData, DraggedItemData } from '@/screens/newprogrambook/layout/types';
 import type { ProgramBookData as ProgramBookDataType } from '@/types/programBook';
+import type { ProgramBook, ProgramBookDetail } from '@/types/programBook';
 
 // 프로그램북 전체 데이터
 export const programBookAtom = atom<ProgramBookDataType>({
@@ -47,3 +48,39 @@ export interface AnalysisResult {
 export const pdfFilePathAtom = atom<string>('');
 
 export const selectedLayoutAtom = atom<string>('1'); // 기본 레이아웃
+
+/**
+ * 프로그램북 목록 상태를 관리하는 atom
+ * @author 김동현
+ */
+export const programBooksAtom = atom<ProgramBook[]>([]);
+
+/**
+ * 프로그램북 로딩 상태를 관리하는 atom
+ * @author 김동현
+ */
+export const programBooksLoadingAtom = atom<boolean>(false);
+
+/**
+ * 프로그램북 에러 상태를 관리하는 atom
+ * @author 김동현
+ */
+export const programBooksErrorAtom = atom<string | null>(null);
+
+/**
+ * 프로그램북 상세 정보 상태를 관리하는 atom
+ * @author 김동현
+ */
+export const programBookDetailAtom = atom<ProgramBookDetail | null>(null);
+
+/**
+ * 프로그램북 상세 정보 로딩 상태를 관리하는 atom
+ * @author 김동현
+ */
+export const programBookDetailLoadingAtom = atom<boolean>(false);
+
+/**
+ * 프로그램북 상세 정보 에러 상태를 관리하는 atom
+ * @author 김동현
+ */
+export const programBookDetailErrorAtom = atom<string | null>(null);

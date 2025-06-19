@@ -11,7 +11,9 @@ import {
     MovieUploadScreen,
     MovieAnalyzeScreen,
     LoginScreen,
+    ProgramBookDetailScreen,
 } from '@/screens';
+import { PrivateRoute } from '@/components/PrivateRoute';
 import {
     programBookAtom,
     currentMovieLayoutAtom,
@@ -70,15 +72,96 @@ const Router = () => {
                 <Route path="/" element={<HomeScreen />} />
                 <Route path="/login" element={<LoginScreen />} />
                 <Route path="/auth/google/callback" element={<LoginScreen />} />
-                <Route path="/myprogrambooks" element={<MyProgramBooksScreen />} />
-                <Route path="/mymovies/list" element={<MyMoviesScreen />} />
-                <Route path="/mymovies/upload" element={<MovieUploadScreen />} />
-                <Route path="/mymovies/analyze" element={<MovieAnalyzeScreen />} />
-                <Route path="/mymovies/analyze/:movieId" element={<MovieAnalyzeScreen />} />
-                <Route path="/newprogrambook" element={<ResetProgramBookAtoms />} />
-                <Route path="/newprogrambook/select" element={<SelectMoviesScreen />} />
-                <Route path="/newprogrambook/layout" element={<LayoutScreen />} />
-                <Route path="/newprogrambook/review" element={<ReviewScreen />} />
+
+                {/* Protected Routes */}
+                {/* <Route
+                    path="/"
+                    element={
+                        <PrivateRoute>
+                            <HomeScreen />
+                        </PrivateRoute>
+                    }
+                /> */}
+                <Route
+                    path="/myprogrambooks/list"
+                    element={
+                        <PrivateRoute>
+                            <MyProgramBooksScreen />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/mymovies/list"
+                    element={
+                        <PrivateRoute>
+                            <MyMoviesScreen />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/mymovies/upload"
+                    element={
+                        <PrivateRoute>
+                            <MovieUploadScreen />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/mymovies/analyze"
+                    element={
+                        <PrivateRoute>
+                            <MovieAnalyzeScreen />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/mymovies/analyze/:movieId"
+                    element={
+                        <PrivateRoute>
+                            <MovieAnalyzeScreen />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/newprogrambook"
+                    element={
+                        <PrivateRoute>
+                            <ResetProgramBookAtoms />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/newprogrambook/select"
+                    element={
+                        <PrivateRoute>
+                            <SelectMoviesScreen />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/newprogrambook/layout"
+                    element={
+                        <PrivateRoute>
+                            <LayoutScreen />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/newprogrambook/review"
+                    element={
+                        <PrivateRoute>
+                            <ReviewScreen />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/myprogrambooks/detail/:id"
+                    element={
+                        <PrivateRoute>
+                            <ProgramBookDetailScreen />
+                        </PrivateRoute>
+                    }
+                />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </BrowserRouter>

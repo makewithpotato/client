@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { pdfFilePathAtom } from '@/atoms/programBook';
 import { TopBar } from '@/components';
-import { Wrapper, Section, Title, Description, Container, DownloadButton } from './styles';
+import { Wrapper, Section, Title, Description, Container, DownloadButton } from './index.styled';
 import { saveAs } from 'file-saver';
 
 interface LocationState {

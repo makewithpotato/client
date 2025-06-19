@@ -15,6 +15,8 @@ export const Wrapper = styled.header`
 export const Logo = styled.div`
     font-weight: 700;
     font-size: 20px;
+    display: flex;
+    align-items: center;
 `;
 
 export const Nav = styled.nav`
