@@ -5,3 +5,4 @@ export * from './home';
 export * from './myprogrambooks';
 export * from './mymovies';
 export * from './newprogrambook';
+export * from './auth';
