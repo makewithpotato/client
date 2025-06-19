@@ -1,7 +1,7 @@
 /**
  * 영화 상태 타입
  */
-export type MovieStatus = 'UPLOADING' | 'ANALYZE' | 'COMPLETE';
+export type MovieStatus = 'UPLOADING' | 'ANALYZE' | 'COMPLETE' | string;
 
 /**
  * 영화 정보 타입

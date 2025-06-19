@@ -10,49 +10,56 @@ interface MoviePageProps {
 }
 
 export const MoviePage: React.FC<MoviePageProps> = ({ movie, pageNumber }) => {
-    const mainImage = movie.draggedItems?.find((item) => item.zone === 'mainImage');
-    const secondImage = movie.draggedItems?.find((item) => item.zone === 'secondImage');
-    const director = movie.draggedItems?.find((item) => item.zone === 'director');
-    const synopsis = movie.draggedItems?.find((item) => item.zone === 'synopsis');
-    const review = movie.draggedItems?.find((item) => item.zone === 'review');
+    const mainImage = movie.draggedItems?.find((item) => item.zone === 'Main Image');
+    const secondImage = movie.draggedItems?.find((item) => item.zone === 'Sub Image');
+    const firstSection = movie.draggedItems?.find((item) => item.zone === 'First Section');
+    const secondSection = movie.draggedItems?.find((item) => item.zone === 'Second Section');
+    const thirdSection = movie.draggedItems?.find((item) => item.zone === 'Third Section');
 
     const renderFirstPage = () => (
-        <Page size="A4" style={{ padding: 0, backgroundColor: 'white' }}>
+        <Page size="A4" style={movieStyles.page}>
             <View style={movieStyles.container}>
                 <View style={movieStyles.mainImageSection}>
                     {mainImage && <Image src={mainImage.content} style={movieStyles.mainImage} />}
                 </View>
 
-                <View style={movieStyles.titleSection}>
-                    <Text style={movieStyles.title}>{movie.movie.title}</Text>
-                </View>
+                <View style={movieStyles.bottomSection}>
+                    <View style={movieStyles.titleSection}>
+                        <Text style={movieStyles.title}>{movie.movie.title}</Text>
+                        <Text style={movieStyles.titleEng}>{movie.movie.originalTitle}</Text>
+                    </View>
 
-                <View style={movieStyles.directorSection}>
-                    {director && (
-                        <>
-                            <Text style={movieStyles.directorTitle}>감독</Text>
-                            <Text style={movieStyles.directorContent}>{director.content}</Text>
-                        </>
-                    )}
+                    <View style={movieStyles.directorSection}>
+                        {firstSection && (
+                            <>
+                                <Text style={movieStyles.directorTitle}>{firstSection.title}</Text>
+                                <Text style={movieStyles.directorContent}>{firstSection.content}</Text>
+                            </>
+                        )}
+                    </View>
                 </View>
             </View>
         </Page>
     );
 
     const renderSecondPage = () => (
-        <Page size="A4" style={{ padding: 0, backgroundColor: 'white' }}>
+        <Page size="A4" style={movieStyles.page}>
             <View style={movieStyles.secondPageContainer}>
                 <View style={movieStyles.contentWrapper}>
-                    {synopsis && (
+                    {secondSection && (
                         <View style={movieStyles.contentSection}>
-                            <Text style={movieStyles.contentTitle}>줄거리</Text>
-                            <Text style={movieStyles.contentText}>{synopsis.content}</Text>
+                            <Text style={movieStyles.sectionLabel}>{secondSection.title}</Text>
+                            <View style={movieStyles.contentBox}>
+                                <Text style={movieStyles.contentText}>{secondSection.content}</Text>
+                            </View>
                         </View>
                     )}
-                    {review && (
+                    {thirdSection && (
                         <View style={movieStyles.contentSection}>
-                            <Text style={movieStyles.contentTitle}>영화에 대하여</Text>
-                            <Text style={movieStyles.contentText}>{review.content}</Text>
+                            <Text style={movieStyles.sectionLabel}>{thirdSection.title}</Text>
+                            <View style={movieStyles.contentBox}>
+                                <Text style={movieStyles.contentText}>{thirdSection.content}</Text>
+                            </View>
                         </View>
                     )}
                 </View>
@@ -63,7 +70,7 @@ export const MoviePage: React.FC<MoviePageProps> = ({ movie, pageNumber }) => {
                     </View>
                 )}
 
-                <Text style={movieStyles.pageNumber}>{pageNumber + 1}</Text>
+                <Text style={movieStyles.pageNumber}>{pageNumber}</Text>
             </View>
         </Page>
     );

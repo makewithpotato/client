@@ -19,7 +19,7 @@ export const MyMoviesScreen = () => {
     };
 
     const handleMovieClick = (movie: Movie) => {
-        if (movie.status === 'ANALYZE') {
+        if (movie.status === 'COMPLETE') {
             navigate(`/mymovies/analyze/${movie.movieId}`);
         }
     };
