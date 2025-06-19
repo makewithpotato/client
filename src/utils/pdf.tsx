@@ -1,5 +1,3 @@
-import React from 'react';
-import { saveAs } from 'file-saver';
 import { pdf, Font } from '@react-pdf/renderer';
 import type { ProgramBookData } from '@/types/programBook';
 import { ProgramBookDocument } from '@/screens/newprogrambook/layout/components/ProgramBookDocument';
