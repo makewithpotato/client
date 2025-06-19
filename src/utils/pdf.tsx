@@ -4,10 +4,14 @@ import { pdf, Font } from '@react-pdf/renderer';
 import type { ProgramBookData } from '@/types/programBook';
 import { ProgramBookDocument } from '@/screens/newprogrambook/layout/components/ProgramBookDocument';
 
-// Register Cairo font from Google Fonts
+// Register Pretendard fonts
 Font.register({
-    family: 'Cairo',
-    src: 'https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hOA-a1PiKg.ttf',
+    family: 'Pretendard',
+    fonts: [
+        { src: '/fonts/Pretendard-Regular.ttf', fontWeight: 400 },
+        { src: '/fonts/Pretendard-Medium.ttf', fontWeight: 500 },
+        { src: '/fonts/Pretendard-Bold.ttf', fontWeight: 700 },
+    ],
 });
 
 // TODO: 추후 서버 측 구현으로 변경 필요
@@ -16,7 +20,7 @@ Font.register({
 // - 파일 접근 권한 및 보안 설정
 // - 임시 파일 자동 정리 로직 구현
 
-export const generateAndSavePDF = async (data: ProgramBookData): Promise<string> => {
+export const generateAndSavePDF = async (data: ProgramBookData): Promise<{ blob: Blob; filename: string }> => {
     try {
         // Generate PDF blob
         const doc = <ProgramBookDocument data={data} />;
@@ -25,13 +29,8 @@ export const generateAndSavePDF = async (data: ProgramBookData): Promise<string>
         // Generate unique filename
         const timestamp = new Date().getTime();
         const filename = `program_book_${timestamp}.pdf`;
-        const filepath = `testpdf/${filename}`;
 
-        // Save to local filesystem
-        // Note: In a real production environment, this should be handled by the server
-        saveAs(blob, filepath);
-
-        return filepath;
+        return { blob, filename };
     } catch (error) {
         console.error('Failed to generate PDF:', error);
         throw error;

@@ -27,21 +27,45 @@ interface Layout {
 }
 
 const LAYOUTS: Layout[] = [
-    { id: '1', title: 'Basic Layout', image: '/layouts/basic.png', zones: ['top', 'middle', 'bottom'] },
-    { id: '2', title: 'Poster Layout', image: '/layouts/poster.png', zones: ['left', 'right'] },
-    { id: '3', title: 'Text Layout', image: '/layouts/text.png', zones: ['header', 'content', 'footer'] },
+    {
+        id: '1',
+        title: 'Two Page Layout',
+        image: '/layouts/two-page.png',
+        zones: ['mainImage', 'secondImage', 'director', 'synopsis', 'review'],
+    },
 ];
 
 export const LayoutPreviewPanel = () => {
     const [movieLayouts, setMovieLayouts] = useAtom(movieLayoutsAtom);
     const [movieDraggedItems, setMovieDraggedItems] = useAtom(movieDraggedItemsAtom);
     const [currentMovieIndex] = useAtom(currentMovieIndexAtom);
-    const [programBook] = useAtom(programBookAtom);
+    const [programBook, setProgramBook] = useAtom(programBookAtom);
 
     const currentMovie = programBook.movies[currentMovieIndex];
     const currentLayoutId = currentMovie ? movieLayouts[currentMovie.movieId] || '1' : '1';
     const currentLayout = LAYOUTS.find((l) => l.id === currentLayoutId) || LAYOUTS[0];
     const currentItems = currentMovie ? movieDraggedItems[currentMovie.movieId] || [] : [];
+
+    // 이미지 미리보기를 위한 스타일
+    const imagePreviewStyle = {
+        width: '100%',
+        height: '200px',
+        objectFit: 'contain' as const,
+        borderRadius: '4px',
+        marginBottom: '8px',
+        backgroundColor: '#f5f5f5',
+    };
+
+    const imageContainerStyle = {
+        width: '100%',
+        height: '200px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f5f5f5',
+        borderRadius: '4px',
+        marginBottom: '8px',
+    };
 
     const handleLayoutSelect = (layoutId: string) => {
         if (!currentMovie) return;
@@ -59,9 +83,24 @@ export const LayoutPreviewPanel = () => {
             const item = JSON.parse(e.dataTransfer.getData('text/plain'));
             const newItem: DraggedItemData = { ...item, type: 'analysis' as const, zone };
 
+            // Update movieDraggedItems
             setMovieDraggedItems((prev) => ({
                 ...prev,
                 [currentMovie.movieId]: [...(prev[currentMovie.movieId] || []), newItem],
+            }));
+
+            // Update programBook atom to include the dragged items
+            setProgramBook((prev) => ({
+                ...prev,
+                movies: prev.movies.map((movie, index) => {
+                    if (index === currentMovieIndex) {
+                        return {
+                            ...movie,
+                            draggedItems: [...(movie.draggedItems || []), newItem],
+                        };
+                    }
+                    return movie;
+                }),
             }));
         } catch (error) {
             console.error('Failed to parse dragged item:', error);
@@ -75,24 +114,66 @@ export const LayoutPreviewPanel = () => {
     const handleDelete = (itemId: string, zone: string) => {
         if (!currentMovie) return;
 
+        // Update movieDraggedItems
         setMovieDraggedItems((prev) => ({
             ...prev,
             [currentMovie.movieId]: (prev[currentMovie.movieId] || []).filter(
                 (item) => !(item.id === itemId && item.zone === zone)
             ),
         }));
+
+        // Update programBook atom to remove the deleted item
+        setProgramBook((prev) => ({
+            ...prev,
+            movies: prev.movies.map((movie, index) => {
+                if (index === currentMovieIndex) {
+                    return {
+                        ...movie,
+                        draggedItems: (movie.draggedItems || []).filter(
+                            (item) => !(item.id === itemId && item.zone === zone)
+                        ),
+                    };
+                }
+                return movie;
+            }),
+        }));
     };
 
     const renderDropZone = (zone: string, title: string) => {
-        const zoneItems = currentItems.filter((item) => item.zone === zone);
+        const items = currentItems.filter((item) => item.zone === zone);
+        const isImageZone = zone === 'mainImage' || zone === 'secondImage';
+        const maxItems = isImageZone ? 1 : undefined;
 
         return (
-            <DropZone onDrop={(e) => handleDrop(e, zone)} onDragOver={handleDragOver}>
-                <DropZoneTitle>{title}</DropZoneTitle>
-                {zoneItems.map((item, index) => (
-                    <AnalysisItem key={`${item.id}-${index}`}>
-                        <AnalysisTitle>{item.type}</AnalysisTitle>
-                        <AnalysisContent>{item.content}</AnalysisContent>
+            <DropZone
+                key={zone}
+                onDrop={(e) => {
+                    if (isImageZone && items.length >= 1) {
+                        alert('이미지 영역에는 하나의 이미지만 추가할 수 있습니다.');
+                        return;
+                    }
+                    handleDrop(e, zone);
+                }}
+                onDragOver={handleDragOver}
+            >
+                <DropZoneTitle>
+                    {zone === 'mainImage' ? 'Main Image' : zone === 'secondImage' ? 'Second Image' : title}
+                </DropZoneTitle>
+                {items.map((item, index) => (
+                    <AnalysisItem key={index}>
+                        {isImageZone ? (
+                            <>
+                                <div style={imageContainerStyle}>
+                                    <img src={item.content} alt={item.title} style={imagePreviewStyle} />
+                                </div>
+                                <AnalysisTitle>{item.title}</AnalysisTitle>
+                            </>
+                        ) : (
+                            <>
+                                <AnalysisTitle>{item.title}</AnalysisTitle>
+                                <AnalysisContent>{item.content}</AnalysisContent>
+                            </>
+                        )}
                         <DeleteButton onClick={() => handleDelete(item.id, zone)}>×</DeleteButton>
                     </AnalysisItem>
                 ))}
@@ -116,7 +197,7 @@ export const LayoutPreviewPanel = () => {
                 {LAYOUTS.map((layout) => (
                     <LayoutOption
                         key={layout.id}
-                        isSelected={currentLayoutId === layout.id}
+                        isSelected={layout.id === currentLayoutId}
                         onClick={() => handleLayoutSelect(layout.id)}
                     >
                         <LayoutImage src={layout.image} alt={layout.title} />
@@ -124,7 +205,6 @@ export const LayoutPreviewPanel = () => {
                     </LayoutOption>
                 ))}
             </LayoutGrid>
-
             <PreviewPanel>
                 {currentLayout.zones.map((zone) => renderDropZone(zone, zone.charAt(0).toUpperCase() + zone.slice(1)))}
             </PreviewPanel>

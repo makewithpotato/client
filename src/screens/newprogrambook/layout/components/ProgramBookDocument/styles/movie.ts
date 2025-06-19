@@ -1,57 +1,154 @@
-import { StyleSheet } from '@react-pdf/renderer';
+import { StyleSheet, Font } from '@react-pdf/renderer';
+
+// Register fonts
+Font.register({
+    family: 'Pretendard',
+    fonts: [
+        { src: '/fonts/Pretendard-Regular.ttf' },
+        { src: '/fonts/Pretendard-Bold.ttf', fontWeight: 'bold' },
+        { src: '/fonts/Pretendard-SemiBold.ttf', fontWeight: 600 },
+    ],
+});
 
 export const movieStyles = StyleSheet.create({
-    page: {
+    container: {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#ffffff',
+        position: 'relative',
+        backgroundColor: 'white',
+        fontFamily: 'Pretendard',
+    },
+    titleSection: {
+        position: 'absolute',
+        left: 0,
+        top: '50%',
+        width: '30%',
+        height: '50%',
+        backgroundColor: '#00B15C',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20,
+    },
+    title: {
+        color: 'white',
+        fontSize: 24,
+        fontFamily: 'Pretendard',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    mainImageSection: {
+        width: '100%',
+        height: '50%',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    mainImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+    },
+    directorSection: {
+        position: 'absolute',
+        right: 0,
+        top: '50%',
+        width: '70%',
+        height: '50%',
         padding: 40,
-        fontFamily: 'Cairo',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
     },
-    basicLayout: {
+    directorTitle: {
+        fontSize: 18,
+        fontFamily: 'Pretendard',
+        fontWeight: 'bold',
+        marginBottom: 12,
+        color: '#333333',
+    },
+    directorContent: {
+        fontSize: 12,
+        fontFamily: 'Pretendard',
+        lineHeight: 1.6,
+        color: '#666666',
+    },
+    secondarySection: {
         flex: 1,
-        gap: 20,
+        padding: 40,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 24,
     },
-    movieHeader: {
-        flexDirection: 'row',
-        gap: 20,
+    sectionTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 16,
+        color: '#333333',
+    },
+    sectionContent: {
+        fontSize: 16,
+        lineHeight: 1.6,
+        color: '#666666',
+    },
+    // 두 번째 페이지 스타일
+    secondPageContainer: {
+        padding: '40px 30px',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: 'white',
+        height: '100%',
+        position: 'relative',
+        fontFamily: 'Pretendard',
+    },
+    contentWrapper: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 30,
         marginBottom: 30,
     },
-    movieImage: {
-        width: 120,
-        height: 180,
-        objectFit: 'cover',
+    contentSection: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
     },
-    movieInfo: {
-        flex: 1,
-        fontSize: 14,
-        marginBottom: 20,
-    },
-    movieTitle: {
-        fontSize: 18,
-        fontFamily: 'Cairo',
+    contentTitle: {
+        fontSize: 16,
+        fontFamily: 'Pretendard',
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 8,
+        color: '#333333',
     },
-    analysisItem: {
-        marginBottom: 15,
-        padding: 15,
-        backgroundColor: '#f8f8f8',
-        borderRadius: 8,
+    contentText: {
+        fontSize: 11,
+        fontFamily: 'Pretendard',
+        lineHeight: 1.6,
+        color: '#666666',
+        textAlign: 'justify',
     },
-    analysisTitle: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        marginBottom: 5,
+    secondImageSection: {
+        width: '100%',
+        height: '200px',
+        marginTop: 'auto',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    analysisContent: {
-        fontSize: 12,
-        lineHeight: 1.5,
+    secondImage: {
+        maxWidth: '80%',
+        maxHeight: '180px',
+        objectFit: 'contain',
     },
     pageNumber: {
         position: 'absolute',
         bottom: 30,
-        right: 40,
-        fontSize: 12,
+        right: 30,
+        fontSize: 10,
+        fontFamily: 'Pretendard',
         color: '#666666',
     },
 });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { TopBar, SearchBar } from '@/components';
@@ -59,6 +59,11 @@ export const SelectMoviesScreen = () => {
     const [search, setSearch] = useState('');
     const [activeTab, setActiveTab] = useState<'all' | 'shared'>('all');
     const [currentPage, setCurrentPage] = useState(1);
+
+    // Reset selected movies when component mounts
+    useEffect(() => {
+        setSelectedMovies([]);
+    }, [setSelectedMovies]);
 
     const handleMovieSelect = (movieId: string) => {
         const movie = movies.find((m) => m.id === movieId);

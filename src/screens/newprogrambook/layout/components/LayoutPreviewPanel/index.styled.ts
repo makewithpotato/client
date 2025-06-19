@@ -83,27 +83,28 @@ export const LayoutButton = styled.button<{ disabled?: boolean }>`
 `;
 
 export const Panel = styled.div`
+    flex: 2;
     background: white;
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    height: 100%;
+    overflow: hidden;
 `;
 
 export const Title = styled.h2`
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     color: #333;
-    margin: 0;
+    margin: 0 0 24px 0;
 `;
 
 export const LayoutGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
-    flex: 1;
+    margin-bottom: 24px;
 `;
 
 export const LayoutCard = styled.div<{ selected?: boolean }>`
@@ -131,19 +132,35 @@ export const LayoutTitle = styled.h3`
     font-size: 16px;
     font-weight: 500;
     color: #333;
-    margin: 12px 0 0 0;
+    margin: 0;
     text-align: center;
 `;
 
 export const PreviewPanel = styled.div`
-    background: white;
-    border: 1px solid #e1e1e1;
-    border-radius: 8px;
-    padding: 24px;
-    min-height: 400px;
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 16px;
-    margin-top: 24px;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
 `;
 
 export const DropZone = styled.div`
@@ -163,12 +180,11 @@ export const DropZone = styled.div`
     }
 `;
 
-export const DropZoneTitle = styled.h5`
-    font-size: 14px;
+export const DropZoneTitle = styled.h4`
+    font-size: 16px;
     font-weight: 500;
-    color: #666;
-    margin: 0;
-    text-align: center;
+    color: #333;
+    margin: 0 0 12px 0;
 `;
 
 export const AnalysisItem = styled.div`
@@ -176,33 +192,45 @@ export const AnalysisItem = styled.div`
     border: 1px solid #e1e1e1;
     border-radius: 6px;
     padding: 12px;
+    position: relative;
 `;
 
-export const AnalysisTitle = styled.h6`
+export const AnalysisTitle = styled.h4`
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     color: #333;
-    margin: 0 0 8px;
+    margin: 0 0 8px 0;
 `;
 
 export const AnalysisContent = styled.p`
     font-size: 14px;
+    line-height: 1.5;
     color: #666;
     margin: 0;
-    line-height: 1.4;
+    white-space: pre-wrap;
 `;
 
 export const DeleteButton = styled.button`
-    background: none;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
     border: none;
-    color: #ff4444;
+    background: rgba(0, 0, 0, 0.1);
+    color: #666;
+    font-size: 16px;
+    line-height: 1;
     cursor: pointer;
-    padding: 4px;
-    margin: -4px;
-    float: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 
     &:hover {
-        color: #cc0000;
+        background: rgba(0, 0, 0, 0.2);
+        color: #333;
     }
 `;
 
@@ -213,22 +241,22 @@ export const PreviewWrapper = styled.div`
 `;
 
 export const LayoutOption = styled.div<{ isSelected: boolean }>`
-    background: white;
+    border: 2px solid ${({ isSelected }) => (isSelected ? '#007aff' : '#e1e1e1')};
     border-radius: 8px;
-    padding: 16px;
+    padding: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    border: 2px solid ${({ isSelected }) => (isSelected ? '#007AFF' : 'transparent')};
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
 
     &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-color: #007aff;
+        background: #f0f7ff;
     }
 `;
 
 export const LayoutImage = styled.img`
     width: 100%;
-    height: auto;
+    height: 120px;
+    object-fit: cover;
     border-radius: 4px;
+    margin-bottom: 8px;
 `;

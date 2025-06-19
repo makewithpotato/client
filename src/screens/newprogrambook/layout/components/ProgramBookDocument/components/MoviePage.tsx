@@ -1,87 +1,77 @@
 import React from 'react';
-import { Page, Text, View, Image } from '@react-pdf/renderer';
+import { Page, View, Text, Image } from '@react-pdf/renderer';
+import type { MovieLayoutData } from '@/types/index';
 import { movieStyles } from '../styles/movie';
-import { layoutStyles } from '../styles/layouts';
-import type { MovieLayoutData } from '@/types';
 
 interface MoviePageProps {
-    movieData: MovieLayoutData;
+    movie: MovieLayoutData;
     pageNumber: number;
     totalPages: number;
 }
 
-export const MoviePage: React.FC<MoviePageProps> = ({ movieData, pageNumber, totalPages }) => {
-    const renderAnalysisItems = (items: any[]) =>
-        items.map((item, index) => (
-            <View key={index} style={movieStyles.analysisItem}>
-                <Text style={movieStyles.analysisTitle}>{item.title}</Text>
-                <Text style={movieStyles.analysisContent}>{item.content}</Text>
+export const MoviePage: React.FC<MoviePageProps> = ({ movie, pageNumber }) => {
+    const mainImage = movie.draggedItems?.find((item) => item.zone === 'mainImage');
+    const secondImage = movie.draggedItems?.find((item) => item.zone === 'secondImage');
+    const director = movie.draggedItems?.find((item) => item.zone === 'director');
+    const synopsis = movie.draggedItems?.find((item) => item.zone === 'synopsis');
+    const review = movie.draggedItems?.find((item) => item.zone === 'review');
+
+    const renderFirstPage = () => (
+        <Page size="A4" style={{ padding: 0, backgroundColor: 'white' }}>
+            <View style={movieStyles.container}>
+                <View style={movieStyles.mainImageSection}>
+                    {mainImage && <Image src={mainImage.content} style={movieStyles.mainImage} />}
+                </View>
+
+                <View style={movieStyles.titleSection}>
+                    <Text style={movieStyles.title}>{movie.movie.title}</Text>
+                </View>
+
+                <View style={movieStyles.directorSection}>
+                    {director && (
+                        <>
+                            <Text style={movieStyles.directorTitle}>감독</Text>
+                            <Text style={movieStyles.directorContent}>{director.content}</Text>
+                        </>
+                    )}
+                </View>
             </View>
-        ));
+        </Page>
+    );
 
-    const renderLayout = () => {
-        switch (movieData.layout) {
-            case 'poster':
-                return (
-                    <View style={layoutStyles.posterLayout}>
-                        <View style={layoutStyles.leftColumn}>
-                            <Image src={movieData.movie.posterPath} style={layoutStyles.largeMovieImage} />
-                            <Text style={movieStyles.movieTitle}>{movieData.movie.title}</Text>
+    const renderSecondPage = () => (
+        <Page size="A4" style={{ padding: 0, backgroundColor: 'white' }}>
+            <View style={movieStyles.secondPageContainer}>
+                <View style={movieStyles.contentWrapper}>
+                    {synopsis && (
+                        <View style={movieStyles.contentSection}>
+                            <Text style={movieStyles.contentTitle}>줄거리</Text>
+                            <Text style={movieStyles.contentText}>{synopsis.content}</Text>
                         </View>
-                        <View style={layoutStyles.rightColumn}>{renderAnalysisItems(movieData.draggedItems)}</View>
-                    </View>
-                );
+                    )}
+                    {review && (
+                        <View style={movieStyles.contentSection}>
+                            <Text style={movieStyles.contentTitle}>영화에 대하여</Text>
+                            <Text style={movieStyles.contentText}>{review.content}</Text>
+                        </View>
+                    )}
+                </View>
 
-            case 'text':
-                return (
-                    <View style={layoutStyles.textLayout}>
-                        <View style={layoutStyles.header}>
-                            <Text style={movieStyles.movieTitle}>{movieData.movie.title}</Text>
-                            {renderAnalysisItems(movieData.draggedItems.filter((item) => item.zone === 'header'))}
-                        </View>
-                        <View style={layoutStyles.content}>
-                            <Image src={movieData.movie.posterPath} style={layoutStyles.smallMovieImage} />
-                            {renderAnalysisItems(movieData.draggedItems.filter((item) => item.zone === 'content'))}
-                        </View>
+                {secondImage && (
+                    <View style={movieStyles.secondImageSection}>
+                        <Image src={secondImage.content} style={movieStyles.secondImage} />
                     </View>
-                );
+                )}
 
-            case 'grid':
-                return (
-                    <View style={layoutStyles.gridLayout}>
-                        <View style={layoutStyles.gridItem}>
-                            <Image src={movieData.movie.posterPath} style={layoutStyles.gridMovieImage} />
-                            <Text style={movieStyles.movieTitle}>{movieData.movie.title}</Text>
-                        </View>
-                        {movieData.draggedItems.map((item, index) => (
-                            <View key={index} style={layoutStyles.gridItem}>
-                                {renderAnalysisItems([item])}
-                            </View>
-                        ))}
-                    </View>
-                );
-
-            default:
-                return (
-                    <View style={movieStyles.basicLayout}>
-                        <View style={movieStyles.movieHeader}>
-                            <Image src={movieData.movie.posterPath} style={movieStyles.movieImage} />
-                            <View style={movieStyles.movieInfo}>
-                                <Text style={movieStyles.movieTitle}>{movieData.movie.title}</Text>
-                            </View>
-                        </View>
-                        {renderAnalysisItems(movieData.draggedItems)}
-                    </View>
-                );
-        }
-    };
+                <Text style={movieStyles.pageNumber}>{pageNumber + 1}</Text>
+            </View>
+        </Page>
+    );
 
     return (
-        <Page size="A4" style={movieStyles.page}>
-            {renderLayout()}
-            <Text style={movieStyles.pageNumber}>
-                {pageNumber} / {totalPages}
-            </Text>
-        </Page>
+        <>
+            {renderFirstPage()}
+            {renderSecondPage()}
+        </>
     );
 };

@@ -13,10 +13,7 @@ import {
     SectionTitle,
     SaveButton,
 } from './index.styled';
-import { MovieInfoCard } from './components/MovieInfoCard';
-import { LayoutPreviewPanel } from './components/LayoutPreviewPanel';
-import { AnalysisResultsPanel } from './components/AnalysisResultsPanel';
-import { ProgramBookTitleModal } from './components/ProgramBookTitleModal';
+import { MovieInfoCard, LayoutPreviewPanel, AnalysisResultsPanel, ProgramBookTitleModal } from './components';
 import { programBookAtom, movieLayoutsAtom, movieDraggedItemsAtom, pdfFilePathAtom } from '@/atoms/programBook';
 import { currentMovieIndexAtom } from '@/atoms';
 import type { ProgramBookData } from '@/types/programBook';
@@ -79,15 +76,32 @@ export const LayoutScreen = () => {
             };
             setProgramBook(updatedProgramBook);
 
-            // Generate and save PDF
-            const pdfPath = await generateAndSavePDF(updatedProgramBook);
-            setPdfFilePath(pdfPath);
+            console.log('Generating PDF for:', updatedProgramBook);
 
-            // Navigate to review screen
-            navigate('/newprogrambook/review');
+            // Generate PDF and store the blob
+            const { blob, filename } = await generateAndSavePDF(updatedProgramBook);
+
+            if (!blob) {
+                throw new Error('PDF blob is null or undefined');
+            }
+
+            console.log('PDF generated successfully, blob size:', blob.size);
+
+            // Store the blob directly for preview
+            const pdfUrl = URL.createObjectURL(blob);
+            console.log('Created blob URL:', pdfUrl);
+            setPdfFilePath(pdfUrl);
+
+            // Store the filename
+            sessionStorage.setItem('pdfFilename', filename);
+
+            // Store blob size for verification
+            sessionStorage.setItem('pdfBlobSize', blob.size.toString());
+
+            // Navigate to review screen with blob data
+            navigate('/newprogrambook/review', { state: { pdfBlob: blob } });
         } catch (error) {
             console.error('Failed to generate PDF:', error);
-            // TODO: Add proper error handling
             alert('PDF 생성에 실패했습니다. 다시 시도해주세요.');
         } finally {
             setIsGeneratingPDF(false);

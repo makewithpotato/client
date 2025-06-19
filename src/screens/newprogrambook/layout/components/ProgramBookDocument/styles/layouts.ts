@@ -1,59 +1,56 @@
 import { StyleSheet } from '@react-pdf/renderer';
 
 export const layoutStyles = StyleSheet.create({
-    posterLayout: {
-        flex: 1,
-        flexDirection: 'row',
-        gap: 30,
-    },
-    leftColumn: {
-        width: '40%',
-    },
-    rightColumn: {
-        flex: 1,
-    },
-    largeMovieImage: {
-        width: '100%',
-        height: 400,
-        objectFit: 'cover',
-        marginBottom: 20,
-    },
-    textLayout: {
+    twoPageLayout: {
         flex: 1,
         gap: 30,
+        padding: 40,
+        backgroundColor: '#00B564',
     },
-    header: {
+    pageContent: {
+        backgroundColor: '#ffffff',
+        padding: 30,
+        borderRadius: 8,
         marginBottom: 20,
     },
-    content: {
-        flex: 1,
+    imageSection: {
         flexDirection: 'row',
         gap: 20,
+        marginBottom: 30,
     },
-    smallMovieImage: {
-        width: 100,
-        height: 150,
+    largeImage: {
+        width: '80%',
+        height: 300,
         objectFit: 'cover',
+        borderRadius: 4,
     },
-    footer: {
-        marginTop: 20,
-    },
-    gridLayout: {
-        flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 20,
-    },
-    gridItem: {
-        width: '45%',
-        padding: 15,
-        backgroundColor: '#f8f8f8',
+    directorSection: {
+        marginBottom: 30,
+        backgroundColor: '#ffffff',
+        padding: 20,
         borderRadius: 8,
     },
-    gridMovieImage: {
-        width: '100%',
-        height: 200,
-        objectFit: 'cover',
+    synopsisSection: {
+        marginBottom: 30,
+        backgroundColor: '#ffffff',
+        padding: 20,
+        borderRadius: 8,
+    },
+    reviewSection: {
+        flex: 1,
+        backgroundColor: '#ffffff',
+        padding: 20,
+        borderRadius: 8,
+    },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
         marginBottom: 10,
+        color: '#333333',
+    },
+    sectionContent: {
+        fontSize: 12,
+        lineHeight: 1.5,
+        color: '#666666',
     },
 });

@@ -27,7 +27,8 @@ export interface MovieLayoutData {
 
 export interface DraggedItemData {
     id: string;
-    type: 'analysis';
+    title: string;
     content: string;
+    type: 'analysis';
     zone: string;
 }

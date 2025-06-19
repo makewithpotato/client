@@ -5,7 +5,7 @@ export const coverStyles = StyleSheet.create({
         flexDirection: 'column',
         backgroundColor: '#ffffff',
         padding: 40,
-        fontFamily: 'Cairo',
+        fontFamily: 'Pretendard',
     },
     container: {
         flex: 1,
