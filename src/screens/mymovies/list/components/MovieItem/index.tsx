@@ -17,12 +17,24 @@ export const MovieItem: React.FC<MovieItemProps> = ({ movie, onClick }) => {
             case 'COMPLETE':
                 return 'Completed';
             default:
+                if (status.startsWith('PROCEEDING[')) {
+                    const progressMatch = status.match(/PROCEEDING\[(\d+)\/(\d+)\]/);
+                    if (progressMatch) {
+                        const [_, current, total] = progressMatch;
+                        const percentage = Math.round((Number(current) / Number(total)) * 100);
+                        if (percentage === 100) {
+                            return 'Analyzing... 99%';
+                        } else {
+                            return `Analyzing... ${percentage}%`;
+                        }
+                    }
+                }
                 return status;
         }
     };
 
     return (
-        <MovieRow onClick={onClick} style={{ cursor: movie.status === 'ANALYZE' ? 'pointer' : 'default' }}>
+        <MovieRow onClick={onClick} style={{ cursor: movie.status === 'COMPLETE' ? 'pointer' : 'default' }}>
             <MovieCell>
                 <MovieTitle>{movie.title}</MovieTitle>
             </MovieCell>
