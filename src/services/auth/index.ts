@@ -18,7 +18,7 @@ const authInstance = axios.create({
  */
 export const googleLogin = async (code: string): Promise<void> => {
     try {
-        const response = await authInstance.get<TAuthResponse>('/api/user/login', {
+        const response = await authInstance.post<TAuthResponse>('/api/user/login', null, {
             params: { code },
         });
 
