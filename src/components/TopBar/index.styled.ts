@@ -12,11 +12,20 @@ export const Wrapper = styled.header`
     border-bottom: 1px solid #eee;
 `;
 
-export const Logo = styled.div`
+export const Logo = styled(Link)`
     font-weight: 700;
     font-size: 20px;
     display: flex;
     align-items: center;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+
+    &:visited,
+    &:hover,
+    &:active {
+        color: inherit;
+    }
 `;
 
 export const Nav = styled.nav`
@@ -72,4 +81,20 @@ export const ProfileImg = styled.img`
     width: 32px;
     height: 32px;
     border-radius: 50%;
+`;
+
+export const AuthButton = styled.button`
+    margin-left: 12px;
+    background: ${({ theme }) => theme.colors.primary};
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.8;
+    }
 `;

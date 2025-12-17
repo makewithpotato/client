@@ -12,6 +12,7 @@ import {
     MovieAnalyzeScreen,
     LoginScreen,
     ProgramBookDetailScreen,
+    CustomProgramBookScreen,
 } from '@/screens';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import {
@@ -135,6 +136,14 @@ const Router = () => {
                     element={
                         <PrivateRoute>
                             <SelectMoviesScreen />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/newprogrambook/custom"
+                    element={
+                        <PrivateRoute>
+                            <CustomProgramBookScreen />
                         </PrivateRoute>
                     }
                 />

@@ -9,4 +9,5 @@ export const ROUTE_NAMES = {
     MY_MOVIES: '/mymovies/list',
     MY_PROGRAM_BOOKS: '/myprogrambooks',
     NEW_PROGRAM_BOOK: '/newprogrambook',
+    CUSTOM_PROGRAM_BOOK: '/newprogrambook/custom',
 } as const;
