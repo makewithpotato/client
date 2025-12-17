@@ -4,7 +4,13 @@ export interface MovieFormData {
     genre: string;
     releaseDate: string;
     cast: string;
+    customPrompts: string[];
+    customRetrievals: string[];
 }
+
+export const DEFAULT_CUSTOM_PROMPTS = [''];
+
+export const DEFAULT_CUSTOM_RETRIEVALS = [''];
 
 export const INITIAL_FORM_DATA: MovieFormData = {
     title: '',
@@ -12,6 +18,8 @@ export const INITIAL_FORM_DATA: MovieFormData = {
     genre: '',
     releaseDate: '',
     cast: '',
+    customPrompts: [...DEFAULT_CUSTOM_PROMPTS],
+    customRetrievals: [...DEFAULT_CUSTOM_RETRIEVALS],
 };
 
 export const GENRES = [
