@@ -24,6 +24,8 @@ export const NextButtonWrapper = styled.div`
     bottom: 40px;
     right: 40px;
     z-index: 100;
+    display: flex;
+    gap: 16px;
 `;
 
 export const NextButton = styled.button<{ disabled: boolean }>`

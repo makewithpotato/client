@@ -77,7 +77,7 @@ export interface AnalysisResult {
 
 export interface MovieLayoutData {
     movieId: string;
-    movie: MovieData;
+    movie?: MovieData;
     layout: 'poster' | 'text' | 'grid' | 'basic';
     layoutId: string;
     draggedItems: DraggedItem[];

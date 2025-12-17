@@ -30,7 +30,6 @@ export const movieLayoutsAtom = atom<MovieLayouts>({});
 export interface MovieData {
     id: string;
     title: string;
-    posterPath: string;
     overview: string;
     releaseDate: string;
     layoutId: string;

@@ -36,6 +36,8 @@ export interface MovieUploadRequest {
     releaseDate: string;
     actor: string;
     totalParts: number;
+    customPrompts?: string[];
+    customRetrievals?: string[];
 }
 
 /**
@@ -86,4 +88,42 @@ export interface MovieUploadCompleteResponse {
     status: number;
     message: string;
     data: null;
+}
+
+/**
+ * 영화 분석 결과 항목 타입
+ */
+export interface PromptResult {
+    prompt: string;
+    result: string;
+}
+
+/**
+ * 영화 분석 검색 결과 항목 타입
+ */
+export interface RetrievalResult {
+    scene: string;
+    uri: string[];
+}
+
+/**
+ * 영화 분석 상세 타입
+ */
+export interface MovieAnalysis {
+    title: string;
+    director: string;
+    actor: string;
+    genre: string;
+    releaseDate: string;
+    promptResults: PromptResult[];
+    retrievalResults: RetrievalResult[];
+}
+
+/**
+ * 영화 분석 상세 응답 타입
+ */
+export interface MovieAnalysisResponse {
+    status: number;
+    message: string;
+    data: MovieAnalysis;
 }
