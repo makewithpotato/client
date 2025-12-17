@@ -5,3 +5,4 @@ export * from './SearchBar';
 export * from './Modal';
 export * from './PrivateRoute';
 export * from './Pagination';
+export * from './MobileBlocker';
