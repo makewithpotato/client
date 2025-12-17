@@ -65,7 +65,7 @@ export const Pagination = ({ current, total, onPage, itemsPerPage = 10 }: Pagina
                 pageNum === -1 ? (
                     <PageDots key={`dots-${index}`}>...</PageDots>
                 ) : (
-                    <PageButton key={pageNum} isActive={current === pageNum} onClick={() => onPage(pageNum)}>
+                    <PageButton key={pageNum} $isActive={current === pageNum} onClick={() => onPage(pageNum)}>
                         {pageNum}
                     </PageButton>
                 )

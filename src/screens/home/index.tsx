@@ -3,18 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { TopBar, ProgramBookCard } from '@/components';
 import { StartProjectCard } from './components';
 import { useProgramBooks } from '@/hooks/useProgramBooks';
-import { Wrapper, Section, CardRow, StartRow, Content } from './index.styled';
+import { getAccessToken } from '@/utils/auth';
+import { ROUTE_NAMES } from '@/constants/routes';
+import { Wrapper, Section, CardRow, StartRow, Content, SectionHeader, MoreButton } from './index.styled';
 
 export const HomeScreen = () => {
     const navigate = useNavigate();
     const { programBooks, isLoading, error, fetchProgramBooks } = useProgramBooks();
+    const isLoggedIn = !!getAccessToken();
 
     useEffect(() => {
-        fetchProgramBooks();
-    }, [fetchProgramBooks]);
+        if (isLoggedIn) {
+            fetchProgramBooks();
+        }
+    }, [isLoggedIn, fetchProgramBooks]);
 
-    // 최근 5개의 프로그램북만 선택
-    const recentProgramBooks = programBooks.slice(0, 5);
+    // 최근 5개의 프로그램북만 선택 (ID가 클수록 최신)
+    const recentProgramBooks = [...programBooks]
+        .sort((a, b) => b.programbookId - a.programbookId)
+        .slice(0, 5);
 
     const handleStartUpload = () => {
         navigate('/mymovies/upload');
@@ -34,8 +41,38 @@ export const HomeScreen = () => {
             <Section>
                 <Content>
                     <h1>Welcome back</h1>
-                    <h2 style={{ marginTop: 32, marginBottom: 16 }}>Your projects</h2>
-                    {isLoading ? (
+                    <SectionHeader>
+                        <h2>Your projects</h2>
+                        {recentProgramBooks.length > 0 && (
+                            <MoreButton onClick={() => navigate('/myprogrambooks/list')}>
+                                more
+                            </MoreButton>
+                        )}
+                    </SectionHeader>
+                    {!isLoggedIn ? (
+                        <div
+                            style={{ padding: '24px', background: '#f5f5f5', borderRadius: '8px', textAlign: 'center' }}
+                        >
+                            <p style={{ marginBottom: '12px', fontSize: '16px', color: '#666' }}>
+                                Please log in to view your projects
+                            </p>
+                            <button
+                                onClick={() => navigate(ROUTE_NAMES.LOGIN)}
+                                style={{
+                                    background: '#ff6b35',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    padding: '10px 24px',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                Go to Login
+                            </button>
+                        </div>
+                    ) : isLoading ? (
                         <div>Loading your projects...</div>
                     ) : error ? (
                         <div>Error: {error}</div>
@@ -57,7 +94,7 @@ export const HomeScreen = () => {
                     <StartRow>
                         <StartProjectCard
                             icon="⬆️"
-                            title="Upload Movie"
+                            title="Upload Video"
                             description="Upload your movie file to begin creating your program book."
                             onClick={handleStartUpload}
                         />
