@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { movieLayoutsAtom, movieDraggedItemsAtom } from '@/atoms/programBook';
 import { currentMovieIndexAtom } from '@/atoms';
 import { programBookAtom } from '@/atoms/programBook';
+import { moviesAtom } from '@/atoms/movies';
 import type { DraggedItemData } from '@/screens/newprogrambook/layout/types';
 import {
     Panel,
@@ -41,11 +42,19 @@ export const LayoutPreviewPanel = () => {
     const [movieDraggedItems, setMovieDraggedItems] = useAtom(movieDraggedItemsAtom);
     const [currentMovieIndex] = useAtom(currentMovieIndexAtom);
     const [programBook, setProgramBook] = useAtom(programBookAtom);
+    const [movies] = useAtom(moviesAtom);
 
     const currentMovie = programBook.movies[currentMovieIndex];
     const currentLayoutId = currentMovie ? movieLayouts[currentMovie.movieId] || '1' : '1';
     const currentLayout = LAYOUTS.find((l) => l.id === currentLayoutId) || LAYOUTS[0];
     const currentItems = currentMovie ? movieDraggedItems[currentMovie.movieId] || [] : [];
+
+    // Get movie title from moviesAtom or fallback to programBook movie data
+    const movieTitle = currentMovie
+        ? currentMovie.movie?.title ||
+          movies.find((m) => m.movieId.toString() === currentMovie.movieId)?.title ||
+          'Unknown Movie'
+        : '';
 
     // 이미지 미리보기를 위한 스타일
     const imagePreviewStyle = {
@@ -192,7 +201,7 @@ export const LayoutPreviewPanel = () => {
 
     return (
         <Panel>
-            <Title>Layout Preview - {currentMovie.movie.title}</Title>
+            <Title>Layout Preview - {movieTitle}</Title>
             <LayoutGrid>
                 {LAYOUTS.map((layout) => (
                     <LayoutOption

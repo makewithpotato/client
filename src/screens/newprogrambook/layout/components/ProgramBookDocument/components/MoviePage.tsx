@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Page, View, Text, Image } from '@react-pdf/renderer';
 import type { MovieLayoutData } from '@/types/index';
 import { movieStyles } from '../styles/movie';
+import { convertImageToBase64 } from '@/utils/image';
 
 interface MoviePageProps {
     movie: MovieLayoutData;
@@ -10,23 +11,41 @@ interface MoviePageProps {
 }
 
 export const MoviePage: React.FC<MoviePageProps> = ({ movie, pageNumber }) => {
+    const [mainImageSrc, setMainImageSrc] = useState<string>('');
+    const [secondImageSrc, setSecondImageSrc] = useState<string>('');
+
     const mainImage = movie.draggedItems?.find((item) => item.zone === 'Main Image');
     const secondImage = movie.draggedItems?.find((item) => item.zone === 'Sub Image');
     const firstSection = movie.draggedItems?.find((item) => item.zone === 'First Section');
     const secondSection = movie.draggedItems?.find((item) => item.zone === 'Second Section');
     const thirdSection = movie.draggedItems?.find((item) => item.zone === 'Third Section');
 
+    useEffect(() => {
+        const loadImages = async () => {
+            if (mainImage?.content) {
+                const base64Main = await convertImageToBase64(mainImage.content);
+                setMainImageSrc(base64Main);
+            }
+            if (secondImage?.content) {
+                const base64Second = await convertImageToBase64(secondImage.content);
+                setSecondImageSrc(base64Second);
+            }
+        };
+
+        loadImages();
+    }, [mainImage?.content, secondImage?.content]);
+
     const renderFirstPage = () => (
         <Page size="A4" style={movieStyles.page}>
             <View style={movieStyles.container}>
                 <View style={movieStyles.mainImageSection}>
-                    {mainImage && <Image src={mainImage.content} style={movieStyles.mainImage} />}
+                    {mainImageSrc && <Image src={mainImageSrc} style={movieStyles.mainImage} />}
                 </View>
 
                 <View style={movieStyles.bottomSection}>
                     <View style={movieStyles.titleSection}>
-                        <Text style={movieStyles.title}>{movie.movie.title}</Text>
-                        <Text style={movieStyles.titleEng}>{movie.movie.originalTitle}</Text>
+                        <Text style={movieStyles.title}>{movie.movie?.title || 'Untitled'}</Text>
+                        <Text style={movieStyles.titleEng}>{movie.movie?.originalTitle || ''}</Text>
                     </View>
 
                     <View style={movieStyles.directorSection}>
@@ -64,9 +83,9 @@ export const MoviePage: React.FC<MoviePageProps> = ({ movie, pageNumber }) => {
                     )}
                 </View>
 
-                {secondImage && (
+                {secondImageSrc && (
                     <View style={movieStyles.secondImageSection}>
-                        <Image src={secondImage.content} style={movieStyles.secondImage} />
+                        <Image src={secondImageSrc} style={movieStyles.secondImage} />
                     </View>
                 )}
 

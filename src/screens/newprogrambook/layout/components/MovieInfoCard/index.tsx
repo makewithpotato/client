@@ -16,7 +16,7 @@ export const MovieInfoCard: React.FC<MovieInfoCardProps> = ({ movie, isSelected,
 
     return (
         <Card isSelected={isSelected} onClick={handleClick} role="button" tabIndex={0}>
-            <MoviePoster src={movie.posterPath} alt={movie.title} />
+            <MoviePoster />
             <MovieInfo>
                 <MovieTitle>{movie.title}</MovieTitle>
                 <MovieReleaseDate>{movie.releaseDate}</MovieReleaseDate>

@@ -59,7 +59,7 @@ export interface DraggedItem {
 
 export interface MovieLayoutData {
     movieId: string;
-    movie: Movie;
+    movie?: Movie;
     layoutId: string;
     draggedItems: DraggedItem[];
 }
