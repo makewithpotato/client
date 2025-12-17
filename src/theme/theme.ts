@@ -1,6 +1,8 @@
 export const theme = {
     colors: {
         primary: '#a08b8b',
+        pay: '#a14d4d',
+        payHover: '#a08b8b',
         secondary: '#1db954',
         secondaryHover: '#1ed760',
         background: '#f5f5f5',
