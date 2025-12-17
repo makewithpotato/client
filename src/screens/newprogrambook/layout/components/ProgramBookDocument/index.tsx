@@ -24,27 +24,30 @@ export const ProgramBookDocument: React.FC<ProgramBookDocumentProps> = ({ data }
             };
             return {
                 movieId: layoutData.movieId,
-                movie: {
-                    id: layoutData.movie.id,
-                    title: layoutData.movie.title,
-                    originalTitle: layoutData.movie.title,
-                    releaseDate: layoutData.movie.releaseDate,
-                    runtime: 0,
-                    overview: layoutData.movie.overview,
-                    posterPath: layoutData.movie.posterPath,
-                    backdropPath: layoutData.movie.posterPath,
-                    voteAverage: 0,
-                    genres: [],
-                },
+                movie: layoutData.movie
+                    ? {
+                          id: layoutData.movie.id,
+                          title: layoutData.movie.title,
+                          originalTitle: layoutData.movie.title,
+                          releaseDate: layoutData.movie.releaseDate,
+                          runtime: 0,
+                          overview: layoutData.movie.overview,
+                          posterPath: layoutData.movie.posterPath,
+                          backdropPath: layoutData.movie.posterPath,
+                          voteAverage: 0,
+                          genres: [],
+                      }
+                    : undefined,
                 layoutId: '1',
                 draggedItems:
                     layoutData.draggedItems ||
-                    layoutData.movie.analysisResults.map((result) => ({
+                    layoutData.movie?.analysisResults.map((result) => ({
                         id: result.id,
                         title: result.type,
                         content: result.content,
                         zone: layoutData.draggedItems?.find((item) => item.id === result.id)?.zone || 'default',
-                    })),
+                    })) ||
+                    [],
             };
         }
         const movieData = movie as MovieData;

@@ -8,16 +8,23 @@ export const SearchBarWrapper = styled.div`
 
 export const Input = styled.input`
     width: 100%;
-    padding: 14px 20px;
+    padding: 14px 16px;
     border-radius: 8px;
     border: none;
     background: #f5eaea;
     font-size: 16px;
-    color: #a08b8b;
+    font-family: ${({ theme }) => theme.fonts.pretendard};
+    color: ${({ theme }) => theme.colors.text};
     outline: none;
+    box-sizing: border-box;
+
     &::placeholder {
-        color: #a08b8b;
+        color: ${({ theme }) => theme.colors.gray500};
         opacity: 1;
+    }
+
+    &:focus {
+        background: #f0e5e5;
     }
 `;
 

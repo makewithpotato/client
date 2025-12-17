@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 import { TopBar } from '@/components';
 import {
@@ -14,8 +14,16 @@ import {
     SaveButton,
 } from './index.styled';
 import { MovieInfoCard, LayoutPreviewPanel, AnalysisResultsPanel, ProgramBookTitleModal } from './components';
-import { programBookAtom, movieLayoutsAtom, movieDraggedItemsAtom, pdfFilePathAtom } from '@/atoms/programBook';
+import {
+    programBookAtom,
+    movieLayoutsAtom,
+    movieDraggedItemsAtom,
+    pdfFilePathAtom,
+    currentMovieLayoutAtom,
+    selectedLayoutAtom,
+} from '@/atoms/programBook';
 import { currentMovieIndexAtom } from '@/atoms';
+import { moviesAtom } from '@/atoms/movies';
 import type { ProgramBookData } from '@/types/programBook';
 import { generateAndSavePDF } from '@/utils/pdf.tsx';
 import { useCreateProgramBook } from '@/hooks/useCreateProgramBook';
@@ -23,13 +31,53 @@ import { useCreateProgramBook } from '@/hooks/useCreateProgramBook';
 export const LayoutScreen = () => {
     const navigate = useNavigate();
     const [programBook, setProgramBook] = useAtom(programBookAtom);
-    const [movieLayouts] = useAtom(movieLayoutsAtom);
-    const [movieDraggedItems] = useAtom(movieDraggedItemsAtom);
+    const [movieLayouts, setMovieLayouts] = useAtom(movieLayoutsAtom);
+    const [movieDraggedItems, setMovieDraggedItems] = useAtom(movieDraggedItemsAtom);
     const [currentMovieIndex, setCurrentMovieIndex] = useAtom(currentMovieIndexAtom);
     const [, setPdfFilePath] = useAtom(pdfFilePathAtom);
+    const setCurrentMovieLayout = useSetAtom(currentMovieLayoutAtom);
+    const setSelectedLayout = useSetAtom(selectedLayoutAtom);
+    const [movies] = useAtom(moviesAtom);
     const [isTitleModalOpen, setIsTitleModalOpen] = useState(false);
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const { createProgramBook, isLoading: isUploading, error: uploadError } = useCreateProgramBook();
+
+    // PDF 생성 완료 후 atoms 리셋 함수
+    const resetProgramBookAtoms = useCallback(() => {
+        setProgramBook({ title: '', description: '', movies: [] });
+        setMovieLayouts({});
+        setMovieDraggedItems({});
+        setCurrentMovieIndex(0);
+        setPdfFilePath('');
+        setCurrentMovieLayout(null);
+        setSelectedLayout('1');
+        sessionStorage.removeItem('pdfFilename');
+        sessionStorage.removeItem('pdfBlobSize');
+    }, [
+        setProgramBook,
+        setMovieLayouts,
+        setMovieDraggedItems,
+        setCurrentMovieIndex,
+        setPdfFilePath,
+        setCurrentMovieLayout,
+        setSelectedLayout,
+    ]);
+
+    // Helper function to get movie data by movieId
+    const getMovieData = useCallback(
+        (movieId: string) => {
+            const movieFromList = movies.find((m) => m.movieId.toString() === movieId);
+            return {
+                id: movieId,
+                title: movieFromList?.title || 'Unknown Movie',
+                posterPath: movieFromList?.thumbnailUrl || '',
+                releaseDate: movieFromList?.releaseDate || '',
+                overview: '',
+                analysisResults: [],
+            };
+        },
+        [movies]
+    );
 
     // Reset currentMovieIndex when movies change
     useEffect(() => {
@@ -105,6 +153,9 @@ export const LayoutScreen = () => {
             // Store the filename
             sessionStorage.setItem('pdfFilename', filename);
 
+            // Reset atoms after successful upload
+            resetProgramBookAtoms();
+
             // Navigate to review screen with blob data
             navigate('/newprogrambook/review', { state: { pdfBlob: blob } });
         } catch (error) {
@@ -134,19 +185,22 @@ export const LayoutScreen = () => {
             <TopBar />
             <Content>
                 <MovieSelectionSection>
-                    <SectionTitle>Selected Movies</SectionTitle>
+                    <SectionTitle>Selected Videos</SectionTitle>
                     <MovieCardsWrapper>
-                        {programBook.movies.map((movieLayout, index) => (
-                            <MovieInfoCard
-                                key={movieLayout.movieId}
-                                movie={{
-                                    ...movieLayout.movie,
-                                    layoutId: movieLayouts[movieLayout.movieId] || '1',
-                                }}
-                                isSelected={index === currentMovieIndex}
-                                onClick={() => handleMovieSelect(index)}
-                            />
-                        ))}
+                        {programBook.movies.map((movieLayout, index) => {
+                            const movieData = movieLayout.movie || getMovieData(movieLayout.movieId);
+                            return (
+                                <MovieInfoCard
+                                    key={movieLayout.movieId}
+                                    movie={{
+                                        ...movieData,
+                                        layoutId: movieLayouts[movieLayout.movieId] || '1',
+                                    }}
+                                    isSelected={index === currentMovieIndex}
+                                    onClick={() => handleMovieSelect(index)}
+                                />
+                            );
+                        })}
                     </MovieCardsWrapper>
                 </MovieSelectionSection>
 

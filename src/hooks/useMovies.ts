@@ -15,25 +15,33 @@ export const useMovies = () => {
 
     /**
      * 영화 목록을 가져옵니다.
+     * @param options.silent 로딩 상태를 변경하지 않고 조용히 데이터를 갱신합니다 (폴링 등에서 사용)
      */
-    const fetchMovies = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
+    const fetchMovies = useCallback(
+        async (options?: { silent?: boolean }) => {
+            try {
+                if (!options?.silent) {
+                    setIsLoading(true);
+                }
+                setError(null);
 
-            const response = await MOVIE_API.getMovieList();
+                const response = await MOVIE_API.getMovieList();
 
-            if (response.status === 200) {
-                setMovies(response.data);
-            } else {
-                setError(response.message);
+                if (response.status === 200) {
+                    setMovies(response.data);
+                } else {
+                    setError(response.message);
+                }
+            } catch (error) {
+                setError(error instanceof Error ? error.message : '영화 목록을 가져오는데 실패했습니다.');
+            } finally {
+                if (!options?.silent) {
+                    setIsLoading(false);
+                }
             }
-        } catch (error) {
-            setError(error instanceof Error ? error.message : '영화 목록을 가져오는데 실패했습니다.');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [setMovies, setIsLoading, setError]);
+        },
+        [setMovies, setIsLoading, setError]
+    );
 
     return {
         movies,

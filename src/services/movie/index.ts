@@ -6,6 +6,7 @@ import type {
     MovieUploadResponse,
     MovieUploadCompleteRequest,
     MovieUploadCompleteResponse,
+    MovieAnalysisResponse,
 } from '@/types/movie';
 
 const MOVIE_API = {
@@ -61,6 +62,17 @@ const MOVIE_API = {
      */
     completeMultipartUpload: async (data: MovieUploadCompleteRequest): Promise<MovieUploadCompleteResponse> => {
         const response = await privateServerInstance.post<MovieUploadCompleteResponse>('/api/movie/complete', data);
+        return response.data;
+    },
+
+    /**
+     * 특정 영화의 분석 정보를 가져옵니다.
+     * @param movieId 영화 ID
+     * @returns 영화 분석 상세 응답
+     * @author 김동현
+     */
+    getMovieAnalysis: async (movieId: number | string): Promise<MovieAnalysisResponse> => {
+        const response = await privateServerInstance.get<MovieAnalysisResponse>(`/api/movie/${movieId}`);
         return response.data;
     },
 };

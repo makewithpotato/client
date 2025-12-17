@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TopBar } from '@/components';
 import type { MovieFormData } from './type';
 import { INITIAL_FORM_DATA } from './type';
-import { MovieForm, LoadingScreen } from './components';
+import { MovieForm } from './components';
 import { useMovieUpload } from '@/hooks/useMovieUpload';
 import {
     Wrapper,
@@ -22,14 +22,25 @@ import {
     NextButton,
 } from './index.styled';
 
+type CustomFieldKey = 'customPrompts' | 'customRetrievals';
+
+const cloneInitialFormData = (): MovieFormData => ({
+    ...INITIAL_FORM_DATA,
+    customPrompts: [...INITIAL_FORM_DATA.customPrompts],
+    customRetrievals: [...INITIAL_FORM_DATA.customRetrievals],
+});
+
+const sanitizeCustomValues = (values: string[]) =>
+    values.map((value) => value.trim()).filter((value) => value.length > 0);
+
 export const MovieUploadScreen = () => {
     const navigate = useNavigate();
     const [isDragging, setIsDragging] = useState(false);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-    const [formData, setFormData] = useState<MovieFormData>(INITIAL_FORM_DATA);
+    const [formData, setFormData] = useState<MovieFormData>(cloneInitialFormData);
     const [videoUrl, setVideoUrl] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { uploadMovie, isLoading, error, progress } = useMovieUpload();
+    const { startUploadInBackground, isLoading, error } = useMovieUpload();
 
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -97,6 +108,45 @@ export const MovieUploadScreen = () => {
         }));
     };
 
+    const updateCustomField = (key: CustomFieldKey, updater: (current: string[]) => string[]) => {
+        setFormData((prev) => ({
+            ...prev,
+            [key]: updater(prev[key]),
+        }));
+    };
+
+    const handleCustomPromptChange = (index: number, value: string) => {
+        updateCustomField('customPrompts', (current) => {
+            const next = [...current];
+            next[index] = value;
+            return next;
+        });
+    };
+
+    const handleAddCustomPrompt = () => {
+        updateCustomField('customPrompts', (current) => [...current, '']);
+    };
+
+    const handleRemoveCustomPrompt = (index: number) => {
+        updateCustomField('customPrompts', (current) => current.filter((_, idx) => idx !== index));
+    };
+
+    const handleCustomRetrievalChange = (index: number, value: string) => {
+        updateCustomField('customRetrievals', (current) => {
+            const next = [...current];
+            next[index] = value;
+            return next;
+        });
+    };
+
+    const handleAddCustomRetrieval = () => {
+        updateCustomField('customRetrievals', (current) => [...current, '']);
+    };
+
+    const handleRemoveCustomRetrieval = (index: number) => {
+        updateCustomField('customRetrievals', (current) => current.filter((_, idx) => idx !== index));
+    };
+
     const handleNext = async () => {
         if (
             uploadedFile &&
@@ -107,20 +157,21 @@ export const MovieUploadScreen = () => {
             formData.cast
         ) {
             try {
-                const result = await uploadMovie({
+                const customPrompts = sanitizeCustomValues(formData.customPrompts);
+                const customRetrievals = sanitizeCustomValues(formData.customRetrievals);
+
+                const result = await startUploadInBackground({
                     title: formData.title,
                     director: formData.director,
                     genre: formData.genre,
                     releaseDate: formData.releaseDate,
                     actor: formData.cast,
                     file: uploadedFile,
+                    customPrompts: customPrompts.length ? customPrompts : undefined,
+                    customRetrievals: customRetrievals.length ? customRetrievals : undefined,
                 });
-
-                if (result.success) {
-                    navigate('/mymovies/list');
-                } else {
-                    throw new Error(error || '업로드에 실패했습니다.');
-                }
+                if (!result.success) throw new Error(error || '업로드에 실패했습니다.');
+                navigate('/mymovies/list');
             } catch (err) {
                 alert(err instanceof Error ? err.message : '업로드 중 오류가 발생했습니다.');
             }
@@ -129,15 +180,11 @@ export const MovieUploadScreen = () => {
         }
     };
 
-    if (isLoading) {
-        return <LoadingScreen progress={progress} />;
-    }
-
     return (
         <Wrapper>
             <TopBar />
             <Content>
-                <Title>Upload your movie</Title>
+                <Title>Upload your video</Title>
                 {!uploadedFile ? (
                     <UploadArea
                         onDrop={handleDrop}
@@ -157,7 +204,16 @@ export const MovieUploadScreen = () => {
                     <MoviePreview>
                         <PreviewHeader>
                             <VideoPreview src={videoUrl} controls />
-                            <MovieForm formData={formData} onChange={handleInputChange} />
+                            <MovieForm
+                                formData={formData}
+                                onChange={handleInputChange}
+                                onCustomPromptChange={handleCustomPromptChange}
+                                onAddCustomPrompt={handleAddCustomPrompt}
+                                onRemoveCustomPrompt={handleRemoveCustomPrompt}
+                                onCustomRetrievalChange={handleCustomRetrievalChange}
+                                onAddCustomRetrieval={handleAddCustomRetrieval}
+                                onRemoveCustomRetrieval={handleRemoveCustomRetrieval}
+                            />
                         </PreviewHeader>
                     </MoviePreview>
                 )}
@@ -171,6 +227,8 @@ export const MovieUploadScreen = () => {
                         !formData.genre ||
                         !formData.releaseDate ||
                         !formData.cast ||
+                        formData.customPrompts.every((prompt) => prompt.trim() === '') ||
+                        formData.customRetrievals.every((retrieval) => retrieval.trim() === '') ||
                         isLoading
                     }
                     onClick={handleNext}

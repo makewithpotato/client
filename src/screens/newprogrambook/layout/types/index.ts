@@ -29,6 +29,6 @@ export interface DraggedItemData {
     id: string;
     title: string;
     content: string;
-    type: 'analysis';
+    type: 'analysis' | 'image';
     zone: string;
 }

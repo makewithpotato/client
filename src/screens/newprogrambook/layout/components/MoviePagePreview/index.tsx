@@ -24,8 +24,8 @@ export const MoviePagePreview: React.FC<MoviePagePreviewProps> = ({ movie, pageN
 
                 <BottomSection>
                     <TitleSection>
-                        <Title>{movie.movie.title}</Title>
-                        <TitleEng>{movie.movie.originalTitle}</TitleEng>
+                        <Title>{movie.movie?.title || 'Untitled'}</Title>
+                        <TitleEng>{movie.movie?.originalTitle || ''}</TitleEng>
                     </TitleSection>
 
                     <DirectorSection>

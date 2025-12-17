@@ -16,16 +16,19 @@ const constructGoogleAuthUrl = () => {
     const baseUrl = import.meta.env.VITE_GOOGLE_AUTH_URL;
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     // 환경변수에서 리다이렉트 URI를 가져오거나, 기본값으로 콜백 경로 사용
-    const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/google/callback`;
+    const redirectUri = `${window.location.origin}/auth/google/callback`;
 
-    const params = new URLSearchParams({
-        client_id: clientId,
-        redirect_uri: redirectUri,
-        response_type: 'code',
-        scope: 'email profile',
-    });
+    // URLSearchParams는 공백을 '+'로 인코딩하므로, scope만큼은 RFC3986 방식('%20')으로 직접 인코딩
+    const query = [
+        ['client_id', clientId],
+        ['redirect_uri', redirectUri],
+        ['response_type', 'code'],
+        ['scope', 'openid email profile'],
+    ]
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+        .join('&');
 
-    return `${baseUrl}?${params.toString()}`;
+    return `${baseUrl}?${query}`;
 };
 
 export const SocialLoginButton: React.FC<SocialLoginButtonProps> = ({ provider }) => {
