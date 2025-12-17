@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { TopBar, ProgramBookCard, SearchBar, Pagination } from '@/components';
-import { Wrapper, Section, CardGrid } from './index.styled';
+import { Wrapper, Section, CardGrid, NewProgramBookButton, Header } from './index.styled';
 import { useState, useEffect } from 'react';
 import { useProgramBooks } from '@/hooks/useProgramBooks';
 
@@ -14,8 +14,10 @@ export const MyProgramBooksScreen = () => {
         fetchProgramBooks();
     }, [fetchProgramBooks]);
 
-    // 검색어로 프로그램북 필터링
-    const filteredBooks = programBooks.filter((book) => book.title.toLowerCase().includes(search.toLowerCase()));
+    // 검색어로 프로그램북 필터링 후 ID 내림차순 정렬 (최신순)
+    const filteredBooks = [...programBooks]
+        .filter((book) => book.title.toLowerCase().includes(search.toLowerCase()))
+        .sort((a, b) => b.programbookId - a.programbookId);
 
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
@@ -23,6 +25,10 @@ export const MyProgramBooksScreen = () => {
 
     const handleProgramBookClick = (id: number) => {
         navigate(`/myprogrambooks/detail/${id}`);
+    };
+
+    const handleNewProgramBook = () => {
+        navigate('/newprogrambook/select');
     };
 
     if (error) {
@@ -41,7 +47,10 @@ export const MyProgramBooksScreen = () => {
         <Wrapper>
             <TopBar />
             <Section>
-                <h1>My Program Books</h1>
+                <Header>
+                    <h1>My Program Books</h1>
+                    <NewProgramBookButton onClick={handleNewProgramBook}>New Program Book</NewProgramBookButton>
+                </Header>
                 <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
                 {/* <TabBar active={tab} onTab={setTab} /> */}
                 {isLoading ? (

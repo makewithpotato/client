@@ -1,8 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { TopBar } from '@/components';
 import { useProgramBookDetail } from '@/hooks/useProgramBookDetail';
-import { Wrapper, Content, Header, Title, BackButton, PDFViewer, LoadingMessage, ErrorMessage } from './index.styled';
+import {
+    Wrapper,
+    Content,
+    Header,
+    Title,
+    ButtonGroup,
+    BackButton,
+    DownloadButton,
+    PDFViewer,
+    LoadingMessage,
+    ErrorMessage,
+} from './index.styled';
 
 export const ProgramBookDetailScreen = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,9 +31,33 @@ export const ProgramBookDetailScreen = () => {
         };
     }, [id, fetchProgramBookDetail, clearProgramBookDetail]);
 
+    const [isDownloading, setIsDownloading] = useState(false);
+
     const handleBack = () => {
         navigate('/myprogrambooks');
     };
+
+    const handleDownload = useCallback(async () => {
+        if (!programBookDetail) return;
+
+        setIsDownloading(true);
+        try {
+            const response = await fetch(programBookDetail.pdfUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${programBookDetail.title}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Download failed:', err);
+        } finally {
+            setIsDownloading(false);
+        }
+    }, [programBookDetail]);
 
     if (isLoading) {
         return (
@@ -75,9 +110,14 @@ export const ProgramBookDetailScreen = () => {
             <Content>
                 <Header>
                     <Title>{programBookDetail.title}</Title>
-                    <BackButton onClick={handleBack}>Back</BackButton>
+                    <ButtonGroup>
+                        <DownloadButton onClick={handleDownload} disabled={isDownloading}>
+                            {isDownloading ? 'Downloading...' : 'Download'}
+                        </DownloadButton>
+                        <BackButton onClick={handleBack}>Back</BackButton>
+                    </ButtonGroup>
                 </Header>
-                <PDFViewer src={programBookDetail.pdfUrl} title="Program Book PDF" />
+                <PDFViewer src={programBookDetail.pdfUrl} title={programBookDetail.title} />
             </Content>
         </Wrapper>
     );
