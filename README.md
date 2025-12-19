@@ -33,15 +33,10 @@
 </p>
 
 <p align="center">
-  <img src="./docs/screenshots/analysis1.png" alt="영화 분석 결과 1" width="800" />
+  <img src="./docs/screenshots/analysis1.png" alt="영화 분석 결과 - 드라마" width="400" />
+  <img src="./docs/screenshots/analysis2.png" alt="영화 분석 결과 - 스포츠 경기" width="400" />
   <br/>
-  <em>AI 영화 분석 결과 - 드라마</em>
-</p>
-
-<p align="center">
-  <img src="./docs/screenshots/analysis2.png" alt="영화 분석 결과 2" width="800" />
-  <br/>
-  <em>AI 영화 분석 결과 - 스포츠 경기</em>
+  <em>AI 영화 분석 결과 (드라마 / 스포츠 경기)</em>
 </p>
 
 <p align="center">
@@ -167,11 +162,14 @@ npm install
 
 ```env
 # API Server
-VITE_API_BASE_URL=http://localhost:8080
+VITE_APP_SERVER_URL=http://localhost:8080
 
 # Google OAuth
 VITE_GOOGLE_CLIENT_ID=your-google-client-id
 VITE_GOOGLE_REDIRECT_URI=http://localhost:5173/auth/google/callback
+
+# Toss Payments (결제 기능)
+VITE_TOSS_CLIENT_KEY=your-toss-client-key
 ```
 
 ### 개발 서버 실행
