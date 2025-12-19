@@ -75,6 +75,15 @@ const MOVIE_API = {
         const response = await privateServerInstance.get<MovieAnalysisResponse>(`/api/movie/${movieId}`);
         return response.data;
     },
+
+    /**
+     * 영화 업로드 실패를 서버에 알립니다.
+     * @param movieId 실패한 영화 ID
+     * @author 김동현
+     */
+    reportUploadFail: async (movieId: number): Promise<void> => {
+        await privateServerInstance.post('/api/movie/fail', { movieId });
+    },
 };
 
 export default MOVIE_API;

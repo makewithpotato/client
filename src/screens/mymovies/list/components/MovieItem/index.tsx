@@ -61,6 +61,8 @@ export const MovieItem: React.FC<MovieItemProps> = ({ movie, onClick }) => {
         switch (status) {
             case 'UPLOADING':
                 return 'Uploading...';
+            case 'FAILED_UPLOADING':
+                return 'Upload Failed';
             case 'ANALYZE':
                 return 'Ready to Analyze';
             case 'COMPLETE':

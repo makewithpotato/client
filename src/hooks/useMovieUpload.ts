@@ -80,6 +80,8 @@ export const useMovieUpload = () => {
      */
     const uploadMovie = useCallback(
         async (data: MovieUploadData): Promise<UploadResult> => {
+            let movieId: number | null = null;
+
             try {
                 setIsLoading(true);
                 setError(null);
@@ -94,7 +96,7 @@ export const useMovieUpload = () => {
                 const uploadResponse = await MOVIE_API.requestMultipartUpload(uploadRequest);
 
                 // movieId 저장
-                const movieId = uploadResponse.data.movieId;
+                movieId = uploadResponse.data.movieId;
                 setUploadingMovieId(movieId);
 
                 // 각 청크 업로드
@@ -153,6 +155,15 @@ export const useMovieUpload = () => {
                     movieId,
                 };
             } catch (error) {
+                // 업로드 실패 시 서버에 알림
+                if (movieId !== null) {
+                    try {
+                        await MOVIE_API.reportUploadFail(movieId);
+                        console.log('[uploadMovie] 업로드 실패 보고 완료:', movieId);
+                    } catch (failError) {
+                        console.error('[uploadMovie] 업로드 실패 보고 에러:', failError);
+                    }
+                }
                 setError(error instanceof Error ? error.message : '영화 업로드에 실패했습니다.');
                 return { success: false };
             } finally {
@@ -196,6 +207,7 @@ export const useMovieUpload = () => {
                             const chunk = chunks[i];
                             const etag = await MOVIE_API.uploadPart(presignedUrl, chunk);
                             uploadedParts.push({ partNumber, etag });
+                            console.log('[startUploadInBackground] 청크 업로드 완료:', etag);
                             // 진행률은 내부적으로만 갱신 (화면 전환 이후를 고려하여 상태 의존 최소화)
                             setProgress((prev) => {
                                 const next = Math.round(((i + 1) / chunks.length) * 100);
@@ -233,7 +245,13 @@ export const useMovieUpload = () => {
                             throw completeError;
                         }
                     } catch (bgError) {
-                        // 오류는 훅 상태에만 기록
+                        // 업로드 실패 시 서버에 알림
+                        try {
+                            await MOVIE_API.reportUploadFail(movieId);
+                            console.log('[startUploadInBackground] 업로드 실패 보고 완료:', movieId);
+                        } catch (failError) {
+                            console.error('[startUploadInBackground] 업로드 실패 보고 에러:', failError);
+                        }
                         console.error('[startUploadInBackground] 백그라운드 업로드 전체 에러:', bgError);
                         setError(bgError instanceof Error ? bgError.message : '영화 업로드에 실패했습니다.');
                     } finally {
