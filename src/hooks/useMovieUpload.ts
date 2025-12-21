@@ -1,11 +1,14 @@
 import { useState, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import MOVIE_API from '@/services/movie';
-import { uploadingMovieIdAtom } from '@/atoms/movies';
+import { uploadingMovieIdAtom, uploadProgressAtom } from '@/atoms/movies';
 import type { UploadedPart, MovieUploadRequest } from '@/types/movie';
 
 // 청크 크기: 5MB
 const CHUNK_SIZE = 5 * 1024 * 1024;
+
+// 동시 업로드 청크 수
+const CONCURRENT_UPLOAD_LIMIT = 5;
 
 interface UploadResult {
     success: boolean;
@@ -44,6 +47,59 @@ const buildUploadRequest = (data: MovieUploadData, totalParts: number): MovieUpl
     return request;
 };
 
+interface ChunkUploadTask {
+    index: number;
+    partNumber: number;
+    presignedUrl: string;
+    chunk: Blob;
+}
+
+/**
+ * 동시성을 제한하여 청크를 병렬 업로드합니다.
+ * @param tasks 업로드할 청크 작업 배열
+ * @param concurrencyLimit 동시 업로드 제한 수
+ * @param onProgress 진행률 콜백
+ * @returns 업로드된 파트 정보 배열
+ */
+const uploadChunksWithConcurrency = async (
+    tasks: ChunkUploadTask[],
+    concurrencyLimit: number,
+    onProgress: (completedCount: number, totalCount: number) => void
+): Promise<UploadedPart[]> => {
+    const results: UploadedPart[] = [];
+    let completedCount = 0;
+    let currentIndex = 0;
+
+    const executeTask = async (): Promise<void> => {
+        while (currentIndex < tasks.length) {
+            const taskIndex = currentIndex++;
+            const task = tasks[taskIndex];
+
+            try {
+                const etag = await MOVIE_API.uploadPart(task.presignedUrl, task.chunk);
+                results.push({ partNumber: task.partNumber, etag });
+                completedCount++;
+                onProgress(completedCount, tasks.length);
+                console.log(`[uploadChunksWithConcurrency] 청크 ${task.partNumber} 업로드 완료:`, etag);
+            } catch (error) {
+                throw new Error(
+                    `Failed to upload part ${task.partNumber}: ${error instanceof Error ? error.message : 'Unknown error'}`
+                );
+            }
+        }
+    };
+
+    // 동시성 제한만큼 워커 생성
+    const workers = Array(Math.min(concurrencyLimit, tasks.length))
+        .fill(null)
+        .map(() => executeTask());
+
+    await Promise.all(workers);
+
+    // partNumber 순서대로 정렬하여 반환
+    return results.sort((a, b) => a.partNumber - b.partNumber);
+};
+
 /**
  * 영화 업로드 훅
  * @returns 영화 업로드 관련 상태와 함수들
@@ -52,8 +108,8 @@ const buildUploadRequest = (data: MovieUploadData, totalParts: number): MovieUpl
 export const useMovieUpload = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [progress, setProgress] = useState(0);
     const [uploadingMovieId, setUploadingMovieId] = useAtom(uploadingMovieIdAtom);
+    const [progress, setProgress] = useAtom(uploadProgressAtom);
 
     /**
      * 파일을 청크로 분할합니다.
@@ -99,24 +155,22 @@ export const useMovieUpload = () => {
                 movieId = uploadResponse.data.movieId;
                 setUploadingMovieId(movieId);
 
-                // 각 청크 업로드
-                const uploadedParts: UploadedPart[] = [];
-                for (let i = 0; i < chunks.length; i++) {
-                    const { partNumber, presignedUrl } = uploadResponse.data.presignedParts[i];
-                    const chunk = chunks[i];
+                // 청크 업로드 작업 생성
+                const uploadTasks: ChunkUploadTask[] = chunks.map((chunk, i) => ({
+                    index: i,
+                    partNumber: uploadResponse.data.presignedParts[i].partNumber,
+                    presignedUrl: uploadResponse.data.presignedParts[i].presignedUrl,
+                    chunk,
+                }));
 
-                    try {
-                        const etag = await MOVIE_API.uploadPart(presignedUrl, chunk);
-                        uploadedParts.push({ partNumber, etag });
-
-                        // 진행률 업데이트
-                        setProgress(Math.round(((i + 1) / chunks.length) * 100));
-                    } catch (error) {
-                        throw new Error(
-                            `Failed to upload part ${partNumber}: ${error instanceof Error ? error.message : 'Unknown error'}`
-                        );
+                // 병렬 업로드 (동시 5개)
+                const uploadedParts = await uploadChunksWithConcurrency(
+                    uploadTasks,
+                    CONCURRENT_UPLOAD_LIMIT,
+                    (completedCount, totalCount) => {
+                        setProgress(Math.round((completedCount / totalCount) * 100));
                     }
-                }
+                );
 
                 // 업로드 완료 요청
                 const completeRequestData = {
@@ -171,7 +225,7 @@ export const useMovieUpload = () => {
                 setUploadingMovieId(null);
             }
         },
-        [splitFileIntoChunks, setUploadingMovieId]
+        [splitFileIntoChunks, setUploadingMovieId, setProgress]
     );
 
     /**
@@ -182,6 +236,7 @@ export const useMovieUpload = () => {
         async (data: MovieUploadData): Promise<UploadResult> => {
             try {
                 setError(null);
+                setProgress(0);
 
                 // 파일을 청크로 분할
                 const chunks = splitFileIntoChunks(data.file);
@@ -201,19 +256,25 @@ export const useMovieUpload = () => {
                 // 실제 업로드와 완료 요청을 백그라운드에서 수행
                 (async () => {
                     try {
-                        const uploadedParts: UploadedPart[] = [];
-                        for (let i = 0; i < chunks.length; i++) {
-                            const { partNumber, presignedUrl } = presignedParts[i];
-                            const chunk = chunks[i];
-                            const etag = await MOVIE_API.uploadPart(presignedUrl, chunk);
-                            uploadedParts.push({ partNumber, etag });
-                            console.log('[startUploadInBackground] 청크 업로드 완료:', etag);
-                            // 진행률은 내부적으로만 갱신 (화면 전환 이후를 고려하여 상태 의존 최소화)
-                            setProgress((prev) => {
-                                const next = Math.round(((i + 1) / chunks.length) * 100);
-                                return next !== prev ? next : prev;
-                            });
-                        }
+                        // 청크 업로드 작업 생성
+                        const uploadTasks: ChunkUploadTask[] = chunks.map((chunk, i) => ({
+                            index: i,
+                            partNumber: presignedParts[i].partNumber,
+                            presignedUrl: presignedParts[i].presignedUrl,
+                            chunk,
+                        }));
+
+                        // 병렬 업로드 (동시 5개)
+                        const uploadedParts = await uploadChunksWithConcurrency(
+                            uploadTasks,
+                            CONCURRENT_UPLOAD_LIMIT,
+                            (completedCount, totalCount) => {
+                                setProgress((prev) => {
+                                    const next = Math.round((completedCount / totalCount) * 100);
+                                    return next !== prev ? next : prev;
+                                });
+                            }
+                        );
 
                         const bgCompleteRequestData = {
                             movieId,
@@ -266,7 +327,7 @@ export const useMovieUpload = () => {
                 return { success: false };
             }
         },
-        [splitFileIntoChunks, setUploadingMovieId]
+        [splitFileIntoChunks, setUploadingMovieId, setProgress]
     );
 
     return {

@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useAtomValue } from 'jotai';
 import {
     MovieRow,
     MovieCell,
@@ -17,6 +18,7 @@ import {
 import type { Movie } from '@/types/movie';
 import { usePayment } from '@/hooks/usePayment';
 import { Modal } from '@/components';
+import { uploadingMovieIdAtom, uploadProgressAtom } from '@/atoms/movies';
 
 export interface MovieItemProps {
     movie: Movie;
@@ -26,8 +28,11 @@ export interface MovieItemProps {
 export const MovieItem: React.FC<MovieItemProps> = ({ movie, onClick }) => {
     const [showModal, setShowModal] = useState(false);
     const { isMoviePaid, requestPayment } = usePayment();
+    const uploadingMovieId = useAtomValue(uploadingMovieIdAtom);
+    const uploadProgress = useAtomValue(uploadProgressAtom);
 
     const isPaid = isMoviePaid(movie.movieId);
+    const isCurrentlyUploading = uploadingMovieId === movie.movieId;
 
     const getEffectiveStatus = useCallback(() => {
         if (isPaid) return movie.status;
@@ -60,6 +65,9 @@ export const MovieItem: React.FC<MovieItemProps> = ({ movie, onClick }) => {
     const getStatusContent = (status: string) => {
         switch (status) {
             case 'UPLOADING':
+                if (isCurrentlyUploading) {
+                    return `Uploading... ${uploadProgress}%`;
+                }
                 return 'Uploading...';
             case 'FAILED_UPLOADING':
                 return 'Upload Failed';

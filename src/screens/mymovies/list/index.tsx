@@ -4,17 +4,35 @@ import { MovieTable } from './components';
 import { useNavigate } from 'react-router-dom';
 import { useMovies } from '@/hooks/useMovies';
 import { useEffect } from 'react';
+import { useAtomValue } from 'jotai';
 import type { Movie } from '@/types/movie';
 import { usePayment } from '@/hooks/usePayment';
+import { uploadingMovieIdAtom } from '@/atoms/movies';
 
 export const MyMoviesScreen = () => {
     const navigate = useNavigate();
     const { movies, isLoading, error, fetchMovies } = useMovies();
     const { isMoviePaid } = usePayment();
+    const uploadingMovieId = useAtomValue(uploadingMovieIdAtom);
 
     useEffect(() => {
         fetchMovies();
     }, [fetchMovies]);
+
+    // 업로드 중 새로고침 방지
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (uploadingMovieId !== null) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [uploadingMovieId]);
 
     // // 창 포커스 시 최신 상태로 갱신
     // useEffect(() => {

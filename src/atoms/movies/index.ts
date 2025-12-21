@@ -24,3 +24,9 @@ export const moviesErrorAtom = atom<string | null>(null);
  * @author 김동현
  */
 export const uploadingMovieIdAtom = atom<number | null>(null);
+
+/**
+ * 업로드 진행률을 관리하는 atom (0-100)
+ * @author 김동현
+ */
+export const uploadProgressAtom = atom<number>(0);
